@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<title>Notes on Euler's Identity</title>
+<script>window.texme = { style: 'plain' }</script>
+<script src="https://cdn.jsdelivr.net/npm/texme@1.2.2"></script>
+<style>
+body {
+    background-color: #0b0c15;
+}
+main {
+  color: #e3e3e3;
+  background: #0b0c15;
+}
+</style>
+<textarea>
+
+# CFI 和 QFI 的计算
+
+
+
+单量子比特系统的哈密顿量为 $H = \frac{1}{2}\omega \sigma_3$，其中 $\omega$ 为频率，$\sigma_3$ 为泡利矩阵。系统的动力学由下式描述：
+
+\begin{align}
+\partial_t\rho=-i[H, \rho]+ \gamma_{+}\left(\sigma_{+}\rho\sigma_{-}-\frac{1}{2}\{\sigma_{-}\sigma_{+},\rho\}\right)+ \gamma_{-}\left(\sigma_{-}\rho\sigma_{+}-\frac{1}{2}\{\sigma_{+}\sigma_{-},\rho\}\right),
+\end{align}
+
+其中 $\sigma_{\pm}=\frac{1}{2}(\sigma_1\pm\mathrm{i}\sigma_2)$，$\sigma_{1}$、$\sigma_{2}$ 为泡利矩阵，$\gamma_{+}$、$\gamma_{-}$ 为衰减率。探针态取为 $|+\rangle$，CFI 的测量选用 $\{|+\rangle\langle+|, |-\rangle\langle-|\}$，这里 $|\pm\rangle:=\frac{1}{\sqrt{2}}(|0\rangle\pm|1\rangle)$，$|0\rangle$ 和 $|1\rangle$ 是 $\sigma_3$ 对应本征值 $1$ 和 $-1$ 的本征态。
+在这里，为了演示便利，我们仅调节耗散系数$\gamma_{-}$，并让$\sigma_1 =\sigma_2$
+
+[1] M. Zhang et al., QuanEstimation: an open-source toolkit for quantum parameter estimation,
+ Phys. Rev. Res. 4, 043057 (2022).
+
+
+</textarea>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<title>Notes on Euler's Identity</title>
+<script>window.texme = { style: 'plain' }</script>
+<script src="https://cdn.jsdelivr.net/npm/texme@1.2.2"></script>
+<style>
+body {
+    background-color: #0b0c15;
+}
+main {
+  color: #e3e3e3;
+  background: #0b0c15;
+}
+</style>
+<textarea>
+
+# CFIM、QFIM 和 HCRB 的计算
+
+
+
+具有 $XX$ 耦合的两量子比特系统的哈密顿量为
+\begin{align}
+H=\omega_1\sigma_3^{(1)}+\omega_2\sigma_3^{(2)}+g\sigma_1^{(1)}\sigma_1^{(2)},
+\end{align}
+其中 $\omega_1$、$\omega_2$ 分别为第一个和第二个量子比特的频率，$\sigma_i^{(1)}= \sigma_i\otimes I$，$\sigma_i^{(2)}=I\otimes\sigma_i$（$i=1,2,3$）。$\sigma_1$、$\sigma_2$、$\sigma_3$ 为泡利矩阵，$I$ 表示单位矩阵。动力学由主方程描述：
+\begin{align}
+\partial_t\rho=-i[H, \rho]+\sum_{i=1,2}\gamma_i\left(\sigma_3^{(i)}\rho\sigma_3^{(i)}-\rho\right)
+\end{align}
+其中 $\gamma_i$ 为第 $i$ 个量子比特的衰减率。
+
+探针态取为 $\frac{1}{\sqrt{2}}(|00\rangle+|11\rangle)$，权重矩阵设为单位矩阵。用于 $\mathrm{Tr}(W\mathcal{I^{-1}})$ 的测量选取 $\{\Pi_1$，$\Pi_2$，$I-\Pi_1-\Pi_2\}$，其中 $\Pi_1=0.85|00\rangle\langle 00|$，$\Pi_2=0.4|\!+\!+\rangle\langle+\!+\!|$。这里 $|\pm\rangle:=\frac{1}{\sqrt{2}}(|0\rangle\pm|1\rangle)$，$|0\rangle$（$|1\rangle$）是 $\sigma_3$ 对应本征值 $1$（$-1$）的本征态。
+[1] M. Zhang et al., QuanEstimation: an open-source toolkit for quantum parameter estimation,
+ Phys. Rev. Res. 4, 043057 (2022).
+
+</textarea>

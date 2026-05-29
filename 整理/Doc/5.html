@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<title>Notes on Euler's Identity</title>
+<script>window.texme = { style: 'plain' }</script>
+<script src="https://cdn.jsdelivr.net/npm/texme@1.2.2"></script>
+<style>
+body {
+    background-color: #0b0c15;
+}
+main {
+  color: #e3e3e3;
+  background: #0b0c15;
+}
+</style>
+<textarea>
+
+
+
+一个单量子比特系统，其动力学由下式描述：
+\begin{align}
+\partial_t\rho=-i[H, \rho]+ \gamma_{+}\left(\sigma_{+}\rho\sigma_{-}-\frac{1}{2}\{\sigma_{-}\sigma_{+},\rho\}\right)+ \gamma_{-}\left(\sigma_{-}\rho\sigma_{+}-\frac{1}{2}\{\sigma_{+}\sigma_{-},\rho\}\right),
+\end{align}
+其中 $H = \frac{1}{2}\omega \sigma_3$ 是自由哈密顿量，$\omega$ 为频率，$\sigma_{\pm}=(\sigma_1 \pm \sigma_2)/2$，$\gamma_{+}$、$\gamma_{-}$ 为衰减率。这里 $\sigma_{i}$（$i=1,2,3$）为泡利矩阵。
+
+在本例中，探针态取为 $\frac{1}{\sqrt{2}}(|0\rangle +|1\rangle)$，$|0\rangle$（$|1\rangle$）是 $\sigma_3$ 对应本征值 $1$（$-1$）的本征态。此处我们使用算法来获得最优投影测量。
+
+[1] M. Zhang et al., QuanEstimation: an open-source toolkit for quantum parameter estimation,
+ Phys. Rev. Res. 4, 043057 (2022).
+</textarea>

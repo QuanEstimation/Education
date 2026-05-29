@@ -1,0 +1,2164 @@
+<!DOCTYPE html>
+<html lang="zh-CN" style="zoom: 0.9;">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>量子费舍尔信息量可视化系统</title>
+    <style>
+        :root {
+            --bg-color: #0b0c15;
+            --panel-bg: #15192b;    
+            --text-primary: #e0e6ed;
+            --text-secondary: #94a3b8;
+            --accent-color: #00f2ff;
+            --accent-glow: rgba(0, 242, 255, 0.4);
+            --border-color: #2d3748;
+            --font-mono: 'Courier New', Courier, monospace;
+            --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            width: 6px;
+            height: 10px;
+            background-color: #ffffff30;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            width: 6px;
+            height: 5px;
+            border-radius: 10px;
+            background-color: var(--accent-color)
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            height: 100vh;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            background-image: radial-gradient(circle at 50% 50%, rgba(21, 25, 43, 0.9) 0%, transparent 100%), linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 100% 100%, 40px 40px, 40px 40px;
+        }
+
+        .main-container {
+            width: 90%;
+            height: 90vh;
+            display: flex;
+            gap: 20px;
+        }
+
+        .intro {
+            text-align: center;
+            color: var(--text-secondary);
+            font-family: var(--font-sans);
+            padding: 0 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center
+        }
+
+        .intro h1 {
+            font-size: 1.8rem;
+            color: var(--accent-color);
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        .intro p {
+            font-size: 1rem;
+            line-height: 1.6;
+            opacity: 0.8;
+            margin-top: 12px;
+            margin-bottom: 20px;
+        }
+
+        .container {
+            flex: 1;
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5), 0 0 10px var(--accent-glow);
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .control-panel {
+            padding: 40px;
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 20px;
+            /* 稍微减小间距以容纳更多滑块 */
+            position: relative;
+            background: rgba(0, 0, 0, 0.2);
+            overflow-y: auto;
+            /* 允许控制面板滚动如果内容过多 */
+        }
+
+        .control-panel::before {
+            content: "CONTROL PANEL";
+            position: absolute;
+            top: 15px;
+            left: 20px;
+            font-size: 0.7rem;
+            color: var(--accent-color);
+            letter-spacing: 2px;
+            opacity: 0.7;
+        }
+
+        h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+            color: var(--accent-color);
+        }
+
+        .param-desc {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            opacity: 0.6;
+            margin-bottom: 10px;
+        }
+
+        .slider-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .label-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            font-family: var(--font-mono);
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .value-display {
+            color: var(--accent-color);
+            font-weight: bold;
+            font-size: 1.0rem;
+            text-shadow: 0 0 5px var(--accent-glow);
+        }
+
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 18px;
+            width: 18px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            cursor: pointer;
+            margin-top: -7px;
+            box-shadow: 0 0 10px var(--accent-color);
+            transition: transform 0.1s;
+        }
+
+        input[type=range]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #2d3748;
+            border-radius: 2px;
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.5);
+        }
+
+        .btn-generate {
+            background: transparent;
+            color: var(--accent-color);
+            border: 1px solid var(--accent-color);
+            padding: 12px 20px;
+            font-family: var(--font-mono);
+            font-size: 0.95rem;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .btn-generate:hover {
+            background: var(--accent-color);
+            color: var(--bg-color);
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        .btn-generate:active {
+            transform: scale(0.98);
+        }
+
+        .btn-generate:abled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            filter: grayscale(1);
+        }
+
+        .display-panel {
+            padding: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        .display-panel::before {
+            content: "VISUALIZATION";
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 0.7rem;
+            color: var(--accent-color);
+            letter-spacing: 2px;
+            opacity: 0.7;
+        }
+
+        .image-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px dashed var(--border-color);
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .image-container img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .placeholder-text {
+            color: var(--text-secondary);
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            text-align: center;
+            opacity: 0.5;
+        }
+
+        .loading-spinner {
+            border: 3px solid rgba(0, 242, 255, 0.1);
+            border-left-color: var(--accent-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                height: 100vh;
+            }
+
+            .container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr;
+            }
+
+            .control-panel {
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+                padding: 20px;
+            }
+
+            .display-panel {
+                padding: 20px;
+            }
+        }
+
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: sans-serif;
+        }
+
+        .main-container {
+            display: flex;
+            height: 120vh;
+            width: 100%;
+        }
+
+        .sidebar {
+            width: 200px;
+            border-right: 1px solid #ffffff50;
+            display: flex;
+            flex-direction: column;
+            padding-top: 20px;
+            flex-shrink: 0;
+        }
+
+        .tab-btn {
+            padding: 15px 20px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            text-align: left;
+            font-size: 16px;
+            color: #ffffff90;
+            transition: background 0.2s;
+            width: 100%;
+        }
+
+        .tab-btn:hover {
+            background-color: #e0e0e0;
+        }
+
+        .tab-btn.active {
+            background-color: #00c3ff30;
+            font-weight: bold;
+            color: #00f2ff;
+            border-left: 2px solid #00f2ff;
+        }
+
+        .content-area {
+            flex-grow: 1;
+            padding: 20px;
+            max-height: 100vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .tab-content {
+            display: none;
+            height: 100%;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .preview-document{
+            position: absolute;
+            min-width: 6rem;
+            flex-shrink: 0;
+            /* bottom: ; */
+            padding: 0.5rem 0;
+            font-size: 0.75rem;
+            left: calc(100% + 1rem);
+            margin: 0;
+            margin-bottom: 0.3rem;
+
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            width: 60%;
+            height: 100%;
+            background-color: var(--panel-bg);
+            border-left: 1px solid var(--accent-color);
+            box-shadow: -5px 0 30px rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            animation: slideIn 0.3s;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+            }
+            to {
+                transform: translateX(0);
+            }
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-title {
+            color: var(--accent-color);
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .modal-close {
+            background: transparent;
+            border: 1px solid var(--accent-color);
+            color: var(--accent-color);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: var(--accent-color);
+            color: var(--bg-color);
+        }
+
+        .modal-body {
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .modal-body iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background-color: var(--bg-color);
+        }
+
+        .tab-dropdown-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .tab-dropdown-trigger {
+            position: relative;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .dropdown-arrow {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.6rem;
+            color: var(--accent-color);
+            transition: transform 0.3s ease;
+        }
+
+        .tab-dropdown-wrapper:hover .dropdown-arrow,
+        .tab-dropdown-wrapper.expanded .dropdown-arrow {
+            transform: translateY(-50%) rotate(180deg);
+        }
+
+        .tab-dropdown-menu {
+            max-height: 0;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.3);
+            border-left: 2px solid transparent;
+            transition: max-height 0.3s ease, border-color 0.3s ease;
+        }
+
+        .tab-dropdown-menu.show {
+            max-height: 200px;
+            border-left: 2px solid var(--accent-color);
+        }
+
+        .tab-dropdown-item {
+            display: block;
+            width: 100%;
+            padding: 10px 20px 10px 30px;
+            background: transparent;
+            border: none;
+            text-align: left;
+            font-size: 13px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .tab-dropdown-item:hover {
+            background: rgba(0, 242, 255, 0.1);
+            color: var(--accent-color);
+        }
+
+        .tab-dropdown-item.active {
+            background: rgba(0, 242, 255, 0.15);
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+
+        .tab5-sub-content {
+            display: none;
+            height: 100%;
+        }
+
+        .tab5-sub-content.active {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <div
+        style="padding: 10px 15px 8px 15px;position: relative;box-shadow: 0 0 10px #00f2ff;display: flex;align-items: center;background-color: #0a0c18;z-index: 999;">
+        <div style="color: var(--accent-color);font-size: 1.75rem;font-weight: bold;">QuanEstimation 量子参数估计可视化系统</div>
+  
+    </div>
+
+    <div class="main-container">
+        <!-- 左侧侧边栏 -->
+        <div class="sidebar">
+            <button class="tab-btn active" onclick="openTab(event, 'tab1')">
+                <div>单量子比特参数估计</div>
+                <div style="font-size: 0.6rem;color: #ffffff70;font-weight: normal;">CramerRao_bounds</div>
+            </button>
+            <button class="tab-btn" onclick="openTab(event, 'tab2')">
+                <div>双量子比特参数估计</div>
+                <div style="font-size: 0.6rem;color: #ffffff70;font-weight: normal;">HCRB_NHB</div>                
+            </button>
+            <!-- Tab 3 按钮 -->
+            <button class="tab-btn" onclick="openTab(event, 'tab3')">
+                <div style="max-width: 160px;overflow-x: hidden;">贝叶斯参数估计</div>
+                <div style="font-size: 0.6rem;color: #ffffff70;font-weight: normal;">Bayesian_CramerRao_bounds</div>
+            </button>
+            <!-- Tab 4 按钮 -->
+            <button class="tab-btn" onclick="openTab(event, 'tab4')">
+                <div style="max-width: 160px;overflow-x: hidden;">
+                    <div style="max-width: 180px;min-width: 180px;">贝叶斯与最大似然估计</div>
+                </div>
+                <div style="font-size: 0.6rem;color: #ffffff70;font-weight: normal;">Quantum_Parameter_Estimation</div>
+            </button>
+            <!-- Tab 5 按钮 - 下拉菜单 -->
+            <div class="tab-dropdown-wrapper">
+                <button class="tab-btn tab-dropdown-trigger" onmouseenter="showTab5Dropdown()" onmouseleave="hideTab5Dropdown()">
+                    <div style="max-width: 160px;overflow-x: hidden;">
+                        <div style="max-width: 180px;min-width: 180px;">测量优化算法</div>
+                    </div>
+                    <div style="font-size: 0.6rem;color: #ffffff70;font-weight: normal;">Measurement_Optimization</div>
+                    <span class="dropdown-arrow">▼</span>
+                </button>
+                <div class="tab-dropdown-menu" id="tab5Dropdown" onmouseenter="keepTab5Dropdown()" onmouseleave="hideTab5Dropdown()">
+                    <button class="tab-dropdown-item active" onclick="openSubTab5(event, 'tab5-1')">投影测量</button>
+                    <button class="tab-dropdown-item" onclick="openSubTab5(event, 'tab5-2')">LC输入测量</button>
+                    <button class="tab-dropdown-item" onclick="openSubTab5(event, 'tab5-3')">旋转输入测量</button>
+                </div>
+            </div>
+            <!-- Tab 6 按钮 -->
+            <button class="tab-btn" onclick="openTab(event, 'tab6')">
+                <div style="max-width: 160px;overflow-x: hidden;">
+                    <div style="max-width: 180px;min-width: 180px;">LMG模型的态优化</div>
+                </div>
+                <div style="font-size: 0.6rem;color: #ffffff70;font-weight: normal;">State_Optimization</div>
+            </button>
+        </div>
+
+        <!-- 右侧内容区域 -->
+        <div class="content-area">
+
+            <!-- Tab 1: 原有内容 -->
+            <div id="tab1" class="tab-content active">
+                <div class="intro">
+                    <div style="position: relative;display: flex;align-items: center;">
+                        <h1>单量子比特参数估计</h1>
+                        <button class="btn-generate preview-document">查看原理</button>
+                    </div>
+                    <p>基于 QuanEstimation 库，模拟单粒子系统中的量子费舍尔信息（QFI）和经典费舍尔信息（CFI）的 演化。</p>
+                </div>
+                <div class="container">
+                    <div class="control-panel">
+                        <div class="param-group">
+                            <h2>系统频率</h2>
+                            <p class="param-desc">ω: 调节系统哈密顿量的本征频率</p>
+                            <div class="slider-group">
+                                <div class="label-row"><span>LOW</span><span id="omegaValue"
+                                        class="value-display">1.00</span></div>
+                                <input type="range" id="omegaSlider" min="0.1" max="5.0" step="0.1" value="1.0">
+                                <div class="label-row" style="font-size: 0.7rem;"><span>0.1</span><span>5.0</span></div>
+                            </div>
+                        </div>
+                        <div class="param-group">
+                            <h2>演化时间</h2>
+                            <p class="param-desc">t: 设置系统演化的最大时间点</p>
+                            <div class="slider-group">
+                                <div class="label-row"><span>SHORT</span><span id="timeValue"
+                                        class="value-display">50</span></div>
+                                <input type="range" id="timeSlider" min="10" max="100" step="10" value="50">
+                                <div class="label-row" style="font-size: 0.7rem;"><span>10</span><span>100</span></div>
+                            </div>
+                        </div>
+                        <div class="param-group">
+                            <h2>耗散系数</h2>
+                            <p class="param-desc">γ: 调节环境对系统的耗散强度</p>
+                            <div class="slider-group">
+                                <div class="label-row"><span>Weak</span><span id="camValue"
+                                        class="value-display">0.5</span></div>
+                                <input type="range" id="camSlider" min="0.1" max="2.0" step="0.1" value="0.5">
+                                <div class="label-row" style="font-size: 0.7rem;"><span>0.1</span><span>2.0</span></div>
+                            </div>
+                        </div>
+                        <button id="generateBtn" class="btn-generate">生成图像</button>
+                        <div id="statusMsg"
+                            style="font-size: 0.8rem; color: var(--text-secondary); font-family: var(--font-mono); height: 1.2em; text-align: center; margin-top: 10px;">
+                        </div>
+                    </div>
+                    <div class="display-panel">
+                        <div class="image-container" id="imageContainer">
+                            <div class="placeholder-text" id="placeholderText">[ 准备就绪 ]<br>调整参数并点击生成</div>
+                            <div class="loading-spinner" id="loadingSpinner"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 2: 原有内容 -->
+            <div id="tab2" class="tab-content">
+                <div class="intro">
+                    <div style="position: relative;display: flex;align-items: center;">
+                        <h1>双量子比特参数估计</h1>
+                        <button class="btn-generate preview-document">查看原理</button>
+                    </div>
+                    <p>基于 QuanEstimation 库，模拟双粒子系统中的 CFI/QFI 演化及 HCRB/NHB 边界。</p>
+                </div>
+                <div class="container">
+                    <div class="control-panel">
+                        <div class="param-group">
+                            <h2>粒子1频率</h2>
+                            <div class="slider-group">
+                                <div class="label-row"><span>LOW</span><span id="omega1Value"
+                                        class="value-display">1.0</span></div>
+                                <input type="range" id="omega1Slider" min="0.1" max="5.0" step="0.1" value="1.0">
+                            </div>
+                        </div>
+                        <div class="param-group">
+                            <h2>粒子2频率</h2>
+                            <div class="slider-group">
+                                <div class="label-row"><span>LOW</span><span id="omega2Value"
+                                        class="value-display">1.0</span></div>
+                                <input type="range" id="omega2Slider" min="0.1" max="5.0" step="0.1" value="1.0">
+                            </div>
+                        </div>
+                        <div class="param-group">
+                            <h2>耦合强度</h2>
+                            <div class="slider-group">
+                                <div class="label-row"><span>WEAK</span><span id="gValue"
+                                        class="value-display">0.1</span></div>
+                                <input type="range" id="gSlider" min="0.0" max="1.0" step="0.05" value="0.1">
+                            </div>
+                        </div>
+                        <div class="param-group">
+                            <h2>耗散速率</h2>
+                            <div class="slider-group">
+                                <div class="label-row"><span>LOW</span><span id="gammaValue"
+                                        class="value-display">0.05</span></div>
+                                <input type="range" id="gammaSlider" min="0.0" max="0.5" step="0.01" value="0.05">
+                            </div>
+                        </div>
+                        <div class="param-group">
+                            <h2>初始态角度</h2>
+                            <div class="slider-group">
+                                <div class="label-row"><span>0</span><span id="thetaValue"
+                                        class="value-display">0.79</span></div>
+                                <input type="range" id="thetaSlider" min="0" max="1.57" step="0.01" value="0.79">
+                            </div>
+                        </div>
+                        <button id="generateBtn2" class="btn-generate">生成分析图</button>
+                        <div id="statusMsg2"
+                            style="font-size: 0.8rem; color: var(--text-secondary); font-family: var(--font-mono); height: 1.2em; text-align: center; margin-top: 10px;">
+                        </div>
+                    </div>
+                    <div class="display-panel">
+                        <div class="image-container" id="imageContainer2">
+                            <div class="placeholder-text" id="placeholderText2">[ 准备就绪 ]<br>调整双量子比特参数并点击生成</div>
+                            <div class="loading-spinner" id="loadingSpinner2"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 3: 新增贝叶斯量子参数估计 -->
+            <div id="tab3" class="tab-content">
+                <div class="intro">
+                    <div style="position: relative;display: flex;align-items: center;">
+                        <h1>贝叶斯量子参数估计</h1>
+                        <button class="btn-generate preview-document">查看原理</button>
+                    </div>
+                    <p>模拟贝叶斯框架下的量子参数估计过程，分析先验分布、演化时间及磁场强度对状态敏感度和布洛赫矢量的影响。</p>
+                </div>
+                <div class="container">
+                    <div class="control-panel">
+                        <!-- 参数 1: eta (先验标准差) -->
+                        <div class="param-group">
+                            <h2>先验不确定度 (η)</h2>
+                            <p class="param-desc">先验分布的标准差 (推荐: 0.01 ~ 2.0)</p>
+                            <div class="slider-group">
+                                <div class="label-row"><span>Small</span><span id="etaValue"
+                                        class="value-display">0.20</span></div>
+                                <input type="range" id="etaSlider" min="0.01" max="2.0" step="0.01" value="0.2">
+                                <div class="label-row" style="font-size: 0.7rem;"><span>0.01</span><span>2.0</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 参数 2: t_end (演化时间) -->
+                        <div class="param-group">
+                            <h2>演化总时间 (T)</h2>
+                            <p class="param-desc">量子演化的总时间长度 (推荐: 0.1 ~ 10.0)</p>
+                            <div class="slider-group">
+                                <div class="label-row"><span>Short</span><span id="tEndValue"
+                                        class="value-display">1.00</span></div>
+                                <input type="range" id="tEndSlider" min="0.1" max="10.0" step="0.1" value="1.0">
+                                <div class="label-row" style="font-size: 0.7rem;"><span>0.1</span><span>10.0</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 参数 3: B_factor (磁场强度) -->
+                        <div class="param-group">
+                            <h2>磁场强度因子 (B)</h2>
+                            <p class="param-desc">磁场强度因子 (单位: π, 推荐: 0.1 ~ 5.0)</p>
+                            <div class="slider-group">
+                                <div class="label-row"><span>Low</span><span id="bFactorValue"
+                                        class="value-display">0.50π</span></div>
+                                <input type="range" id="bFactorSlider" min="0.1" max="5.0" step="0.1" value="0.5">
+                                <div class="label-row" style="font-size: 0.7rem;"><span>0.1π</span><span>5.0π</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 参数 4: omega0 (特征频率) -->
+                        <div class="param-group">
+                            <h2>特征频率 (ω₀)</h2>
+                            <p class="param-desc">特征频率系数 (默认: 1.0)</p>
+                            <div class="slider-group">
+                                <div class="label-row"><span>Low</span><span id="omega0Value"
+                                        class="value-display">1.00</span></div>
+                                <input type="range" id="omega0Slider" min="0.1" max="5.0" step="0.1" value="1.0">
+                                <div class="label-row" style="font-size: 0.7rem;"><span>0.1</span><span>5.0</span></div>
+                            </div>
+                        </div>
+
+                        <!-- 参数 5: mu (先验均值) -->
+                        <div class="param-group" style="display: none;">
+                            <h2>先验均值 (μ)</h2>
+                            <p class="param-desc">先验分布的中心位置 (默认: 0.0)</p>
+                            <div class="slider-group">
+                                <div class="label-row"><span>-π</span><span id="muValue"
+                                        class="value-display">0.00</span></div>
+                                <input type="range" id="muSlider" min="-3.14" max="3.14" step="0.1" value="0.0">
+                                <div class="label-row" style="font-size: 0.7rem;"><span>-π</span><span>π</span></div>
+                            </div>
+                        </div>
+
+                        <!-- 参数 6: x_range_factor (采样范围) -->
+                        <div class="param-group">
+                            <h2>采样范围系数</h2>
+                            <p class="param-desc">实际范围为 [-factor*π, factor*π] (默认: 0.5)</p>
+                            <div class="slider-group">
+                                <div class="label-row"><span>Narrow</span><span id="xRangeValue"
+                                        class="value-display">0.50</span></div>
+                                <input type="range" id="xRangeSlider" min="0.1" max="2.0" step="0.1" value="0.5">
+                                <div class="label-row" style="font-size: 0.7rem;"><span>0.1</span><span>2.0</span></div>
+                            </div>
+                        </div>
+
+                        <button id="generateBtn3" class="btn-generate">生成贝叶斯分析图</button>
+                        <div id="statusMsg3"
+                            style="font-size: 0.8rem; color: var(--text-secondary); font-family: var(--font-mono); height: 1.2em; text-align: center; margin-top: 10px;">
+                        </div>
+                    </div>
+
+                    <div class="display-panel">
+                        <div class="image-container" id="imageContainer3">
+                            <div class="placeholder-text" id="placeholderText3">
+                                [ 准备就绪 ]
+                                <br>
+                                调整贝叶斯参数并点击生成
+                            </div>
+                            <div class="loading-spinner" id="loadingSpinner3"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Tab 3 结束 -->
+
+            <!-- Tab 4: 量子参数估计 - 贝叶斯与最大似然估计 -->
+            <div id="tab4" class="tab-content">
+                <div class="intro">
+                    <div style="position: relative;display: flex;align-items: center;">
+                        <h1>量子参数估计 - 贝叶斯与最大似然估计</h1>
+                        <button class="btn-generate preview-document">查看原理</button>
+                    </div>
+                    <p>模拟量子参数估计过程，对比贝叶斯估计（MAP）与最大似然估计（MLE）的性能差异。</p>
+                </div>
+                <div class="container">
+                    <div class="control-panel">
+                        <!-- 参数 1: B_factor (磁场强度) -->
+                        <div class="param-group">
+                            <h2>磁场强度因子 (B)</h2>
+                            <p class="param-desc">磁场强度因子 (单位: π)</p>
+                            <div class="slider-group">
+                                <div class="label-row"><span>Low</span><span id="bFactorValue4" class="value-display">0.50π</span></div>
+                                <input type="range" id="bFactorSlider4" min="0.1" max="5.0" step="0.1" value="0.5">
+                                <div class="label-row" style="font-size: 0.7rem;"><span>0.1π</span><span>5.0π</span></div>
+                            </div>
+                        </div>
+
+                        <!-- 参数 2: omega0 (角频率) -->
+                        <div class="param-group">
+                            <h2>角频率 (ω₀)</h2>
+                            <p class="param-desc">系统的角频率参数</p>
+                            <div class="slider-group">
+                                <div class="label-row"><span>Low</span><span id="omega0Value4" class="value-display">1.00</span></div>
+                                <input type="range" id="omega0Slider4" min="0.1" max="5.0" step="0.1" value="1.0">
+                                <div class="label-row" style="font-size: 0.7rem;"><span>0.1</span><span>5.0</span></div>
+                            </div>
+                        </div>
+
+                        <!-- 参数 3&4: 参数x范围 (最小值~最大值) -->
+                        <div class="param-group">
+                            <h2>参数 x 范围</h2>
+                            <p class="param-desc">待估计参数 x 的取值范围 (单位: π)</p>
+                            <div class="slider-group">
+                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                                    <div style="flex: 1; display: flex; flex-direction: column; gap: 4px;">
+                                        <div class="label-row" style="margin-bottom: 2px;"><span>MIN</span><span id="xMinValue4" class="value-display">0.00</span></div>
+                                        <input type="number" id="xMinInput4" min="0.0" max="2.0" step="0.01" value="0.0" 
+                                            style="width: 100%; padding: 8px 12px; background: rgba(0, 242, 255, 0.05); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-primary); font-family: var(--font-mono); font-size: 0.9rem; transition: all 0.3s ease;"
+                                            onfocus="this.style.borderColor='var(--accent-color)'; this.style.boxShadow='0 0 10px var(--accent-glow)';"
+                                            onblur="this.style.borderColor='var(--border-color)'; this.style.boxShadow='none';">
+                                    </div>
+                                    <div style="display: flex; align-items: center; justify-content: center; width: 30px; height: 42px; color: var(--accent-color); font-size: 1.5rem; font-weight: bold; margin-top: 20px;">~</div>
+                                    <div style="flex: 1; display: flex; flex-direction: column; gap: 4px;">
+                                        <div class="label-row" style="margin-bottom: 2px;"><span>MAX</span><span id="xMaxValue4" class="value-display">0.50π</span></div>
+                                        <input type="number" id="xMaxInput4" min="0.1" max="2.0" step="0.1" value="0.5" 
+                                            style="width: 100%; padding: 8px 12px; background: rgba(0, 242, 255, 0.05); border: 1px solid var(--border-color); border-radius: 4px; color: var(--text-primary); font-family: var(--font-mono); font-size: 0.9rem; transition: all 0.3s ease;"
+                                            onfocus="this.style.borderColor='var(--accent-color)'; this.style.boxShadow='0 0 10px var(--accent-glow)';"
+                                            onblur="this.style.borderColor='var(--border-color)'; this.style.boxShadow='none';">
+                                    </div>
+                                </div>
+                                <div class="label-row" style="font-size: 0.7rem;"><span>范围: 0 ~ 2.0π</span></div>
+                            </div>
+                        </div>
+
+                        <!-- 参数 5: t_max (时间演化最大值) -->
+                        <div class="param-group">
+                            <h2>演化时间 (T)</h2>
+                            <p class="param-desc">时间演化的最大值</p>
+                            <div class="slider-group">
+                                <div class="label-row"><span>Short</span><span id="tMaxValue4" class="value-display">1.00</span></div>
+                                <input type="range" id="tMaxSlider4" min="0.1" max="10.0" step="0.1" value="1.0">
+                                <div class="label-row" style="font-size: 0.7rem;"><span>0.1</span><span>10.0</span></div>
+                            </div>
+                        </div>
+
+                        <!-- 参数 6: y_num (测量次数) -->
+                        <div class="param-group">
+                            <h2>测量次数 (N)</h2>
+                            <p class="param-desc">重复测量的次数</p>
+                            <div class="slider-group">
+                                <div class="label-row"><span>Few</span><span id="yNumValue4" class="value-display">1000</span></div>
+                                <input type="range" id="yNumSlider4" min="100" max="5000" step="100" value="1000">
+                                <div class="label-row" style="font-size: 0.7rem;"><span>100</span><span>5000</span></div>
+                            </div>
+                        </div>
+
+                        <!-- 参数 7: seed (随机种子) -->
+                        <div class="param-group">
+                            <h2>随机种子</h2>
+                            <p class="param-desc">用于结果复现</p>
+                            <div class="slider-group">
+                                <div class="label-row"><span>Low</span><span id="seedValue4" class="value-display">1234</span></div>
+                                <input type="range" id="seedSlider4" min="1" max="9999" step="1" value="1234">
+                                <div class="label-row" style="font-size: 0.7rem;"><span>1</span><span>9999</span></div>
+                            </div>
+                        </div>
+
+                        <!-- 参数 8: prob_threshold (概率阈值) -->
+                        <div class="param-group">
+                            <h2>概率阈值</h2>
+                            <p class="param-desc">测量结果的概率阈值</p>
+                            <div class="slider-group">
+                                <div class="label-row"><span>Low</span><span id="probThreshValue4" class="value-display">0.333</span></div>
+                                <input type="range" id="probThreshSlider4" min="0.1" max="0.9" step="0.01" value="0.333">
+                                <div class="label-row" style="font-size: 0.7rem;"><span>0.1</span><span>0.9</span></div>
+                            </div>
+                        </div>
+
+                        <button id="generateBtn4" class="btn-generate">生成参数估计图</button>
+                        <div id="statusMsg4"
+                            style="font-size: 0.8rem; color: var(--text-secondary); font-family: var(--font-mono); height: 1.2em; text-align: center; margin-top: 10px;">
+                        </div>
+                    </div>
+
+                    <div class="display-panel">
+                        <div class="image-container" id="imageContainer4">
+                            <div class="placeholder-text" id="placeholderText4">
+                                [ 准备就绪 ]
+                                <br>
+                                调整参数并点击生成
+                            </div>
+                            <div class="loading-spinner" id="loadingSpinner4"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Tab 4 结束 -->
+
+            <!-- Tab 5: 测量优化算法 -->
+            <div id="tab5" class="tab-content">
+                <!-- 子Tab 5-1: 投影测量 -->
+                <div id="tab5-1" class="tab5-sub-content active">
+                    <div class="intro">
+                        <div style="position: relative;display: flex;align-items: center;">
+                            <h1>投影测量优化</h1>
+                            <button class="btn-generate preview-document">查看原理</button>
+                        </div>
+                        <p>基于差分进化算法优化投影测量，分析最优投影测量的结果。</p>
+                    </div>
+                    <div class="container">
+                        <div class="control-panel">
+                            <!-- 参数 1: omega (系统频率) -->
+                            <div class="param-group">
+                                <h2>系统频率 (ω)</h2>
+                                <p class="param-desc">系统哈密顿量的本征频率</p>
+                                <div class="slider-group">
+                                    <div class="label-row"><span>Low</span><span id="omegaValue5" class="value-display">1.00</span></div>
+                                    <input type="range" id="omegaSlider5" min="0.1" max="5.0" step="0.1" value="1.0">
+                                    <div class="label-row" style="font-size: 0.7rem;"><span>0.1</span><span>5.0</span></div>
+                                </div>
+                            </div>
+
+                            <!-- 参数 2: t_end (演化时间) -->
+                            <div class="param-group">
+                                <h2>演化时间 (T)</h2>
+                                <p class="param-desc">系统演化的最大时间点</p>
+                                <div class="slider-group">
+                                    <div class="label-row"><span>Short</span><span id="tEndValue5" class="value-display">10</span></div>
+                                    <input type="range" id="tEndSlider5" min="5" max="50" step="5" value="10">
+                                    <div class="label-row" style="font-size: 0.7rem;"><span>5</span><span>50</span></div>
+                                </div>
+                            </div>
+
+                            <!-- 参数 3: t_points (时间点数) -->
+                            <div class="param-group">
+                                <h2>时间采样点数</h2>
+                                <p class="param-desc">时间演化采样点数量</p>
+                                <div class="slider-group">
+                                    <div class="label-row"><span>Few</span><span id="tPointsValue5" class="value-display">25</span></div>
+                                    <input type="range" id="tPointsSlider5" min="10" max="100" step="5" value="25">
+                                    <div class="label-row" style="font-size: 0.7rem;"><span>10</span><span>100</span></div>
+                                </div>
+                            </div>
+
+                            <!-- 参数 4: decay_rate_1 (衰减率1) -->
+                            <div class="param-group">
+                                <h2>衰减率 1 (γ₁)</h2>
+                                <p class="param-desc">第一个衰减通道的速率</p>
+                                <div class="slider-group">
+                                    <div class="label-row"><span>None</span><span id="decay1Value5" class="value-display">0.00</span></div>
+                                    <input type="range" id="decay1Slider5" min="0.0" max="1.0" step="0.05" value="0.0">
+                                    <div class="label-row" style="font-size: 0.7rem;"><span>0</span><span>1.0</span></div>
+                                </div>
+                            </div>
+
+                            <!-- 参数 5: decay_rate_2 (衰减率2) -->
+                            <div class="param-group">
+                                <h2>衰减率 2 (γ₂)</h2>
+                                <p class="param-desc">第二个衰减通道的速率</p>
+                                <div class="slider-group">
+                                    <div class="label-row"><span>Weak</span><span id="decay2Value5" class="value-display">0.10</span></div>
+                                    <input type="range" id="decay2Slider5" min="0.0" max="1.0" step="0.05" value="0.1">
+                                    <div class="label-row" style="font-size: 0.7rem;"><span>0</span><span>1.0</span></div>
+                                </div>
+                            </div>
+
+                            <!-- 参数 6: max_episode (最大迭代次数) -->
+                            <div class="param-group">
+                                <h2>最大迭代次数</h2>
+                                <p class="param-desc">DE算法的最大迭代次数</p>
+                                <div class="slider-group">
+                                    <div class="label-row"><span>Few</span><span id="maxEpisodeValue5" class="value-display">1000</span></div>
+                                    <input type="range" id="maxEpisodeSlider5" min="100" max="3000" step="100" value="1000">
+                                    <div class="label-row" style="font-size: 0.7rem;"><span>100</span><span>3000</span></div>
+                                </div>
+                            </div>
+
+                            <!-- 参数 7: p_num (粒子数) -->
+                            <div class="param-group">
+                                <h2>粒子数量</h2>
+                                <p class="param-desc">DE算法的粒子数量</p>
+                                <div class="slider-group">
+                                    <div class="label-row"><span>Few</span><span id="pNumValue5" class="value-display">10</span></div>
+                                    <input type="range" id="pNumSlider5" min="5" max="50" step="5" value="10">
+                                    <div class="label-row" style="font-size: 0.7rem;"><span>5</span><span>50</span></div>
+                                </div>
+                            </div>
+
+                            <button id="generateBtn5" class="btn-generate">生成测量优化图</button>
+                            <div id="statusMsg5"
+                                style="font-size: 0.8rem; color: var(--text-secondary); font-family: var(--font-mono); height: 1.2em; text-align: center; margin-top: 10px;">
+                            </div>
+                        </div>
+
+                        <div class="display-panel">
+                            <div class="image-container" id="imageContainer5">
+                                <div class="placeholder-text" id="placeholderText5">
+                                    [ 准备就绪 ]
+                                    <br>
+                                    调整参数并点击生成
+                                </div>
+                                <div class="loading-spinner" id="loadingSpinner5"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 子Tab 5-2: LC输入测量 -->
+                <div id="tab5-2" class="tab5-sub-content">
+                    <div class="intro">
+                        <div style="position: relative;display: flex;align-items: center;">
+                            <h1>LC输入测量优化</h1>
+                            <button class="btn-generate preview-document">查看原理</button>
+                        </div>
+                        <p>基于差分进化算法优化LC输入测量，分析最优LC输入测量的结果。</p>
+                    </div>
+                    <div class="container">
+                        <div class="control-panel">
+                            <!-- 参数 1: omega (系统频率) -->
+                            <div class="param-group">
+                                <h2>系统频率 (ω)</h2>
+                                <p class="param-desc">系统哈密顿量的本征频率</p>
+                                <div class="slider-group">
+                                    <div class="label-row"><span>Low</span><span id="omegaValue5_2" class="value-display">1.00</span></div>
+                                    <input type="range" id="omegaSlider5_2" min="0.1" max="5.0" step="0.1" value="1.0">
+                                    <div class="label-row" style="font-size: 0.7rem;"><span>0.1</span><span>5.0</span></div>
+                                </div>
+                            </div>
+
+                            <!-- 参数 2: t_end (演化时间) -->
+                            <div class="param-group">
+                                <h2>演化时间 (T)</h2>
+                                <p class="param-desc">系统演化的最大时间点</p>
+                                <div class="slider-group">
+                                    <div class="label-row"><span>Short</span><span id="tEndValue5_2" class="value-display">10</span></div>
+                                    <input type="range" id="tEndSlider5_2" min="5" max="50" step="5" value="10">
+                                    <div class="label-row" style="font-size: 0.7rem;"><span>5</span><span>50</span></div>
+                                </div>
+                            </div>
+
+                            <!-- 参数 3: t_points (时间点数) -->
+                            <div class="param-group">
+                                <h2>时间采样点数</h2>
+                                <p class="param-desc">时间演化采样点数量</p>
+                                <div class="slider-group">
+                                    <div class="label-row"><span>Few</span><span id="tPointsValue5_2" class="value-display">25</span></div>
+                                    <input type="range" id="tPointsSlider5_2" min="10" max="100" step="5" value="25">
+                                    <div class="label-row" style="font-size: 0.7rem;"><span>10</span><span>100</span></div>
+                                </div>
+                            </div>
+
+                            <!-- 参数 4: decay_rate_1 (衰减率1) -->
+                            <div class="param-group">
+                                <h2>衰减率 1 (γ₁)</h2>
+                                <p class="param-desc">第一个衰减通道的速率</p>
+                                <div class="slider-group">
+                                    <div class="label-row"><span>None</span><span id="decay1Value5_2" class="value-display">0.00</span></div>
+                                    <input type="range" id="decay1Slider5_2" min="0.0" max="1.0" step="0.05" value="0.0">
+                                    <div class="label-row" style="font-size: 0.7rem;"><span>0</span><span>1.0</span></div>
+                                </div>
+                            </div>
+
+                            <!-- 参数 5: decay_rate_2 (衰减率2) -->
+                            <div class="param-group">
+                                <h2>衰减率 2 (γ₂)</h2>
+                                <p class="param-desc">第二个衰减通道的速率</p>
+                                <div class="slider-group">
+                                    <div class="label-row"><span>Weak</span><span id="decay2Value5_2" class="value-display">0.10</span></div>
+                                    <input type="range" id="decay2Slider5_2" min="0.0" max="1.0" step="0.05" value="0.1">
+                                    <div class="label-row" style="font-size: 0.7rem;"><span>0</span><span>1.0</span></div>
+                                </div>
+                            </div>
+
+                            <!-- 参数 6: max_episode (最大迭代次数) -->
+                            <div class="param-group">
+                                <h2>最大迭代次数</h2>
+                                <p class="param-desc">DE算法的最大迭代次数</p>
+                                <div class="slider-group">
+                                    <div class="label-row"><span>Few</span><span id="maxEpisodeValue5_2" class="value-display">1000</span></div>
+                                    <input type="range" id="maxEpisodeSlider5_2" min="100" max="3000" step="100" value="1000">
+                                    <div class="label-row" style="font-size: 0.7rem;"><span>100</span><span>3000</span></div>
+                                </div>
+                            </div>
+
+                            <!-- 参数 7: p_num (粒子数) -->
+                            <div class="param-group">
+                                <h2>粒子数量</h2>
+                                <p class="param-desc">DE算法的粒子数量</p>
+                                <div class="slider-group">
+                                    <div class="label-row"><span>Few</span><span id="pNumValue5_2" class="value-display">10</span></div>
+                                    <input type="range" id="pNumSlider5_2" min="5" max="50" step="5" value="10">
+                                    <div class="label-row" style="font-size: 0.7rem;"><span>5</span><span>50</span></div>
+                                </div>
+                            </div>
+
+                            <button id="generateBtn5_2" class="btn-generate">生成LC输入测量图</button>
+                            <div id="statusMsg5_2"
+                                style="font-size: 0.8rem; color: var(--text-secondary); font-family: var(--font-mono); height: 1.2em; text-align: center; margin-top: 10px;">
+                            </div>
+                        </div>
+
+                        <div class="display-panel">
+                            <div class="image-container" id="imageContainer5_2">
+                                <div class="placeholder-text" id="placeholderText5_2">
+                                    [ 准备就绪 ]
+                                    <br>
+                                    调整参数并点击生成
+                                </div>
+                                <div class="loading-spinner" id="loadingSpinner5_2"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 子Tab 5-3: 旋转输入测量 -->
+                <div id="tab5-3" class="tab5-sub-content">
+                    <div class="intro">
+                        <div style="position: relative;display: flex;align-items: center;">
+                            <h1>旋转输入测量优化</h1>
+                            <button class="btn-generate preview-document">查看原理</button>
+                        </div>
+                        <p>基于差分进化算法优化旋转输入测量，分析最优旋转输入测量的结果。</p>
+                    </div>
+                    <div class="container">
+                        <div class="control-panel">
+                            <!-- 参数 1: omega (系统频率) -->
+                            <div class="param-group">
+                                <h2>系统频率 (ω)</h2>
+                                <p class="param-desc">系统哈密顿量的本征频率</p>
+                                <div class="slider-group">
+                                    <div class="label-row"><span>Low</span><span id="omegaValue5_3" class="value-display">1.00</span></div>
+                                    <input type="range" id="omegaSlider5_3" min="0.1" max="5.0" step="0.1" value="1.0">
+                                    <div class="label-row" style="font-size: 0.7rem;"><span>0.1</span><span>5.0</span></div>
+                                </div>
+                            </div>
+
+                            <!-- 参数 2: t_end (演化时间) -->
+                            <div class="param-group">
+                                <h2>演化时间 (T)</h2>
+                                <p class="param-desc">系统演化的最大时间点</p>
+                                <div class="slider-group">
+                                    <div class="label-row"><span>Short</span><span id="tEndValue5_3" class="value-display">10</span></div>
+                                    <input type="range" id="tEndSlider5_3" min="5" max="50" step="5" value="10">
+                                    <div class="label-row" style="font-size: 0.7rem;"><span>5</span><span>50</span></div>
+                                </div>
+                            </div>
+
+                            <!-- 参数 3: t_points (时间点数) -->
+                            <div class="param-group">
+                                <h2>时间采样点数</h2>
+                                <p class="param-desc">时间演化采样点数量</p>
+                                <div class="slider-group">
+                                    <div class="label-row"><span>Few</span><span id="tPointsValue5_3" class="value-display">25</span></div>
+                                    <input type="range" id="tPointsSlider5_3" min="10" max="100" step="5" value="25">
+                                    <div class="label-row" style="font-size: 0.7rem;"><span>10</span><span>100</span></div>
+                                </div>
+                            </div>
+
+                            <!-- 参数 4: decay_rate_1 (衰减率1) -->
+                            <div class="param-group">
+                                <h2>衰减率 1 (γ₁)</h2>
+                                <p class="param-desc">第一个衰减通道的速率</p>
+                                <div class="slider-group">
+                                    <div class="label-row"><span>None</span><span id="decay1Value5_3" class="value-display">0.00</span></div>
+                                    <input type="range" id="decay1Slider5_3" min="0.0" max="1.0" step="0.05" value="0.0">
+                                    <div class="label-row" style="font-size: 0.7rem;"><span>0</span><span>1.0</span></div>
+                                </div>
+                            </div>
+
+                            <!-- 参数 5: decay_rate_2 (衰减率2) -->
+                            <div class="param-group">
+                                <h2>衰减率 2 (γ₂)</h2>
+                                <p class="param-desc">第二个衰减通道的速率</p>
+                                <div class="slider-group">
+                                    <div class="label-row"><span>Weak</span><span id="decay2Value5_3" class="value-display">0.10</span></div>
+                                    <input type="range" id="decay2Slider5_3" min="0.0" max="1.0" step="0.05" value="0.1">
+                                    <div class="label-row" style="font-size: 0.7rem;"><span>0</span><span>1.0</span></div>
+                                </div>
+                            </div>
+
+                            <!-- 参数 6: max_episode (最大迭代次数) -->
+                            <div class="param-group">
+                                <h2>最大迭代次数</h2>
+                                <p class="param-desc">DE算法的最大迭代次数</p>
+                                <div class="slider-group">
+                                    <div class="label-row"><span>Few</span><span id="maxEpisodeValue5_3" class="value-display">1000</span></div>
+                                    <input type="range" id="maxEpisodeSlider5_3" min="100" max="3000" step="100" value="1000">
+                                    <div class="label-row" style="font-size: 0.7rem;"><span>100</span><span>3000</span></div>
+                                </div>
+                            </div>
+
+                            <!-- 参数 7: p_num (粒子数) -->
+                            <div class="param-group">
+                                <h2>粒子数量</h2>
+                                <p class="param-desc">DE算法的粒子数量</p>
+                                <div class="slider-group">
+                                    <div class="label-row"><span>Few</span><span id="pNumValue5_3" class="value-display">10</span></div>
+                                    <input type="range" id="pNumSlider5_3" min="5" max="50" step="5" value="10">
+                                    <div class="label-row" style="font-size: 0.7rem;"><span>5</span><span>50</span></div>
+                                </div>
+                            </div>
+
+                            <button id="generateBtn5_3" class="btn-generate">生成旋转输入测量图</button>
+                            <div id="statusMsg5_3"
+                                style="font-size: 0.8rem; color: var(--text-secondary); font-family: var(--font-mono); height: 1.2em; text-align: center; margin-top: 10px;">
+                            </div>
+                        </div>
+
+                        <div class="display-panel">
+                            <div class="image-container" id="imageContainer5_3">
+                                <div class="placeholder-text" id="placeholderText5_3">
+                                    [ 准备就绪 ]
+                                    <br>
+                                    调整参数并点击生成
+                                </div>
+                                <div class="loading-spinner" id="loadingSpinner5_3"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Tab 5 结束 -->
+
+            <!-- Tab 6: 状态优化算法 -->
+            <div id="tab6" class="tab-content">
+                <div class="intro">
+                    <div style="position: relative;display: flex;align-items: center;">
+                        <h1>量子状态优化算法</h1>
+                        <button class="btn-generate preview-document">查看原理</button>
+                    </div>
+                    <p>基于AD算法优化量子状态，生成QFI收敛曲线，分析量子费舍尔信息量的优化过程。</p>
+                </div>
+                <div class="container">
+                    <div class="control-panel">
+                        <!-- 参数 1: N (系统维度) -->
+                        <div class="param-group">
+                            <h2>系统维度 (N)</h2>
+                            <p class="param-desc">自旋粒子数的两倍</p>
+                            <div class="slider-group">
+                                <div class="label-row"><span>Small</span><span id="nValue6" class="value-display">8</span></div>
+                                <input type="range" id="nSlider6" min="2" max="20" step="2" value="8">
+                                <div class="label-row" style="font-size: 0.7rem;"><span>2</span><span>20</span></div>
+                            </div>
+                        </div>
+
+                        <!-- 参数 2: Lambda (耦合系数) -->
+                        <div class="param-group">
+                            <h2>耦合系数 (Λ)</h2>
+                            <p class="param-desc">哈密顿量中的耦合系数</p>
+                            <div class="slider-group">
+                                <div class="label-row"><span>Low</span><span id="lambdaValue6" class="value-display">1.00</span></div>
+                                <input type="range" id="lambdaSlider6" min="0.1" max="5.0" step="0.1" value="1.0">
+                                <div class="label-row" style="font-size: 0.7rem;"><span>0.1</span><span>5.0</span></div>
+                            </div>
+                        </div>
+
+                        <!-- 参数 3: g (相互作用强度) -->
+                        <div class="param-group">
+                            <h2>相互作用强度 (g)</h2>
+                            <p class="param-desc">粒子间的相互作用强度</p>
+                            <div class="slider-group">
+                                <div class="label-row"><span>Weak</span><span id="gValue6" class="value-display">0.50</span></div>
+                                <input type="range" id="gSlider6" min="0.0" max="2.0" step="0.1" value="0.5">
+                                <div class="label-row" style="font-size: 0.7rem;"><span>0</span><span>2.0</span></div>
+                            </div>
+                        </div>
+
+                        <!-- 参数 4: h (外场强度) -->
+                        <div class="param-group">
+                            <h2>外场强度 (h)</h2>
+                            <p class="param-desc">外场强度参数</p>
+                            <div class="slider-group">
+                                <div class="label-row"><span>Weak</span><span id="hValue6" class="value-display">0.10</span></div>
+                                <input type="range" id="hSlider6" min="0.0" max="1.0" step="0.05" value="0.1">
+                                <div class="label-row" style="font-size: 0.7rem;"><span>0</span><span>1.0</span></div>
+                            </div>
+                        </div>
+
+                        <!-- 参数 5: decay_rate (耗散速率) -->
+                        <div class="param-group">
+                            <h2>耗散速率 (γ)</h2>
+                            <p class="param-desc">系统的耗散速率</p>
+                            <div class="slider-group">
+                                <div class="label-row"><span>Weak</span><span id="decayValue6" class="value-display">0.10</span></div>
+                                <input type="range" id="decaySlider6" min="0.0" max="1.0" step="0.05" value="0.1">
+                                <div class="label-row" style="font-size: 0.7rem;"><span>0</span><span>1.0</span></div>
+                            </div>
+                        </div>
+
+                        <!-- 参数 6: t_max (演化时间) -->
+                        <div class="param-group">
+                            <h2>演化时间 (T)</h2>
+                            <p class="param-desc">演化总时间</p>
+                            <div class="slider-group">
+                                <div class="label-row"><span>Short</span><span id="tMaxValue6" class="value-display">10.0</span></div>
+                                <input type="range" id="tMaxSlider6" min="1" max="50" step="1" value="10">
+                                <div class="label-row" style="font-size: 0.7rem;"><span>1</span><span>50</span></div>
+                            </div>
+                        </div>
+
+                        <!-- 参数 7: max_episode (最大迭代次数) -->
+                        <div class="param-group">
+                            <h2>最大迭代次数</h2>
+                            <p class="param-desc">AD算法的最大迭代次数</p>
+                            <div class="slider-group">
+                                <div class="label-row"><span>Few</span><span id="maxEpisodeValue6" class="value-display">20</span></div>
+                                <input type="range" id="maxEpisodeSlider6" min="10" max="100" step="10" value="20">
+                                <div class="label-row" style="font-size: 0.7rem;"><span>10</span><span>100</span></div>
+                            </div>
+                        </div>
+
+                        <!-- 参数 8: epsilon (学习率) -->
+                        <div class="param-group">
+                            <h2>学习率 (ε)</h2>
+                            <p class="param-desc">优化算法的学习率</p>
+                            <div class="slider-group">
+                                <div class="label-row"><span>Small</span><span id="epsilonValue6" class="value-display">0.010</span></div>
+                                <input type="range" id="epsilonSlider6" min="0.001" max="0.1" step="0.001" value="0.01">
+                                <div class="label-row" style="font-size: 0.7rem;"><span>0.001</span><span>0.1</span></div>
+                            </div>
+                        </div>
+
+                        <button id="generateBtn6" class="btn-generate">生成状态优化图</button>
+                        <div id="statusMsg6"
+                            style="font-size: 0.8rem; color: var(--text-secondary); font-family: var(--font-mono); height: 1.2em; text-align: center; margin-top: 10px;">
+                        </div>
+                    </div>
+
+                    <div class="display-panel">
+                        <div style="display: flex; flex-direction: column; gap: 20px; width: 100%; height: 100%;">
+                            <div class="image-container" id="imageContainer6">
+                                <div class="placeholder-text" id="placeholderText6">
+                                    [ 准备就绪 ]
+                                    <br>
+                                    调整参数并点击生成
+                                </div>
+                                <div class="loading-spinner" id="loadingSpinner6"></div>
+                            </div>
+                            <div class="image-container" id="imageContainer6Second">
+                                <div class="placeholder-text" id="placeholderText6Second">
+                                    [ 等待第一张图生成 ]
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Tab 6 结束 -->
+
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // ================= Tab 1 逻辑 =================
+            const omegaSlider = document.getElementById('omegaSlider');
+            const omegaValue = document.getElementById('omegaValue');
+            const timeSlider = document.getElementById('timeSlider');
+            const timeValue = document.getElementById('timeValue');
+            const camSlider = document.getElementById('camSlider');
+            const camValue = document.getElementById('camValue');
+            const generateBtn = document.getElementById('generateBtn');
+            const imageContainer = document.getElementById('imageContainer');
+            const placeholderText = document.getElementById('placeholderText');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const statusMsg = document.getElementById('statusMsg');
+
+            if (omegaSlider) {
+                updateDisplay();
+                omegaSlider.addEventListener('input', updateDisplay);
+                timeSlider.addEventListener('input', updateDisplay);
+                camSlider.addEventListener('input', updateDisplay);
+            }
+
+            function updateDisplay() {
+                if (!omegaSlider) return;
+                omegaValue.textContent = parseFloat(omegaSlider.value).toFixed(2);
+                timeValue.textContent = parseFloat(timeSlider.value).toFixed(0);
+                camValue.textContent = parseFloat(camSlider.value).toFixed(1);
+            }
+
+            // ================= Tab 2 逻辑 =================
+            const omega1Slider = document.getElementById('omega1Slider');
+            const omega1Value = document.getElementById('omega1Value');
+            const omega2Slider = document.getElementById('omega2Slider');
+            const omega2Value = document.getElementById('omega2Value');
+            const gSlider = document.getElementById('gSlider');
+            const gValue = document.getElementById('gValue');
+            const gammaSlider = document.getElementById('gammaSlider');
+            const gammaValue = document.getElementById('gammaValue');
+            const thetaSlider = document.getElementById('thetaSlider');
+            const thetaValue = document.getElementById('thetaValue');
+            const generateBtn2 = document.getElementById('generateBtn2');
+            const imageContainer2 = document.getElementById('imageContainer2');
+            const placeholderText2 = document.getElementById('placeholderText2');
+            const loadingSpinner2 = document.getElementById('loadingSpinner2');
+            const statusMsg2 = document.getElementById('statusMsg2');
+
+            if (omega1Slider) {
+                updateDisplay2();
+                omega1Slider.addEventListener('input', updateDisplay2);
+                omega2Slider.addEventListener('input', updateDisplay2);
+                gSlider.addEventListener('input', updateDisplay2);
+                gammaSlider.addEventListener('input', updateDisplay2);
+                thetaSlider.addEventListener('input', updateDisplay2);
+            }
+
+            function updateDisplay2() {
+                if (!omega1Slider) return;
+                omega1Value.textContent = parseFloat(omega1Slider.value).toFixed(1);
+                omega2Value.textContent = parseFloat(omega2Slider.value).toFixed(1);
+                gValue.textContent = parseFloat(gSlider.value).toFixed(2);
+                gammaValue.textContent = parseFloat(gammaSlider.value).toFixed(2);
+                thetaValue.textContent = parseFloat(thetaSlider.value).toFixed(2);
+            }
+
+            // ================= Tab 3 逻辑 (新增) =================
+            const etaSlider = document.getElementById('etaSlider');
+            const etaValue = document.getElementById('etaValue');
+            const tEndSlider = document.getElementById('tEndSlider');
+            const tEndValue = document.getElementById('tEndValue');
+            const bFactorSlider = document.getElementById('bFactorSlider');
+            const bFactorValue = document.getElementById('bFactorValue');
+            const omega0Slider = document.getElementById('omega0Slider');
+            const omega0Value = document.getElementById('omega0Value');
+            const muSlider = document.getElementById('muSlider');
+            const muValue = document.getElementById('muValue');
+            const xRangeSlider = document.getElementById('xRangeSlider');
+            const xRangeValue = document.getElementById('xRangeValue');
+
+            const generateBtn3 = document.getElementById('generateBtn3');
+            const imageContainer3 = document.getElementById('imageContainer3');
+            const placeholderText3 = document.getElementById('placeholderText3');
+            const loadingSpinner3 = document.getElementById('loadingSpinner3');
+            const statusMsg3 = document.getElementById('statusMsg3');
+
+            if (etaSlider) {
+                updateDisplay3();
+                etaSlider.addEventListener('input', updateDisplay3);
+                tEndSlider.addEventListener('input', updateDisplay3);
+                bFactorSlider.addEventListener('input', updateDisplay3);
+                omega0Slider.addEventListener('input', updateDisplay3);
+                muSlider.addEventListener('input', updateDisplay3);
+                xRangeSlider.addEventListener('input', updateDisplay3);
+            }
+
+            function updateDisplay3() {
+                if (!etaSlider) return;
+                etaValue.textContent = parseFloat(etaSlider.value).toFixed(2);
+                tEndValue.textContent = parseFloat(tEndSlider.value).toFixed(2);
+                // B_factor 显示为 xπ
+                const bVal = parseFloat(bFactorSlider.value).toFixed(2);
+                bFactorValue.textContent = `${bVal}π`;
+                omega0Value.textContent = parseFloat(omega0Slider.value).toFixed(2);
+                muValue.textContent = parseFloat(muSlider.value).toFixed(2);
+                xRangeValue.textContent = parseFloat(xRangeSlider.value).toFixed(2);
+            }
+
+            // ================= 通用请求处理函数 =================
+            async function processImageRequest(url, container, placeholder, spinner, msg, tabId) {
+                try {
+                    // 模拟请求，实际应替换为真实 fetch
+                    // const response = await fetch(url, { method: 'GET', headers: { 'Accept': 'text/html' } });
+                    // if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    // const htmlText = await response.text(); 
+                    // container.innerHTML = htmlText; // 如果是返回图片URL则不同，这里假设后端返回包含img标签的HTML片段或直接替换
+
+                    // 模拟延迟和成功
+                    await new Promise(r => setTimeout(r, 1000));
+
+                    // 注意：实际场景中，这里应该根据后端返回的图片路径更新 img src
+                    // 此处仅为演示逻辑，假设后端直接返回了图片HTML或者我们需要构造图片标签
+                    // 由于原代码逻辑是 fetch 返回 HTML 文本并 innerHTML，我们保持该逻辑
+                    // 但为了演示效果，如果没有真实后端，这里会报错或显示空，
+                    // 用户需确保后端路由 ./createImgBayesian 存在并返回正确格式
+
+                    const response = await fetch(url, { method: 'GET' });
+                    if (!response.ok) throw new Error(`Server returned ${response.status}`);
+
+                    // 假设后端返回的是包含 <img src="..."> 的 HTML 片段，或者直接是图片二进制流处理后的HTML
+                    // 根据原代码逻辑：container.innerHTML = htmlText
+                    const resultHtml = await response.text();
+                    container.innerHTML = resultHtml;
+
+                    placeholder.style.display = 'none';
+                    spinner.style.display = 'none';
+                    msg.textContent = '生成成功！';
+                    msg.style.color = '#4ade80';
+
+                } catch (error) {
+                    console.error('生成失败:', error);
+                    msg.textContent = `错误：${error.message}`;
+                    msg.style.color = '#ef4444';
+                    placeholder.style.display = 'block';
+                    placeholder.innerHTML = `[ 生成失败 ]<br>${error.message}`;
+                    placeholder.style.color = '#ef4444';
+                    setLoadingState(false, tabId);
+                }
+            }
+
+            // ================= 通用加载状态设置 =================
+            function setLoadingState(isLoading, tabId) {
+                let btn, spinner;
+                if (tabId === 1) { btn = generateBtn; spinner = loadingSpinner; }
+                else if (tabId === 2) { btn = generateBtn2; spinner = loadingSpinner2; }
+                else if (tabId === 3) { btn = generateBtn3; spinner = loadingSpinner3; }
+                else if (tabId === 4) { btn = generateBtn4; spinner = loadingSpinner4; }
+                else if (tabId === 5) { btn = generateBtn5; spinner = loadingSpinner5; }
+                else if (tabId === '5_2') { btn = generateBtn5_2; spinner = loadingSpinner5_2; }
+                else if (tabId === '5_3') { btn = generateBtn5_3; spinner = loadingSpinner5_3; }
+                else if (tabId === 6) { btn = generateBtn6; spinner = loadingSpinner6; }
+
+                if (isLoading) {
+                    // if (btn) btn.disabled = true;
+                    if (spinner) spinner.style.display = 'block';
+                } else {
+                    // if (btn) btn.disabled = false;
+                    if (spinner) spinner.style.display = 'none';
+                }
+            }
+
+            // ================= Tab 1 按钮逻辑 =================
+            if (generateBtn) {
+                generateBtn.addEventListener('click', async () => {
+                    if (!document.getElementById('tab1').classList.contains('active')) return;
+                    const omega = parseFloat(omegaSlider.value);
+                    const tEnd = parseInt(timeSlider.value);
+                    const cam = parseFloat(camSlider.value);
+                    const url = `./createImg?omega=${omega}&t_end=${tEnd}&cam=${cam}&_=${Date.now()}`;
+                    setLoadingState(true, 1);
+                    statusMsg.textContent = `请求中...`;
+                    await processImageRequest(url, imageContainer, placeholderText, loadingSpinner, statusMsg, 1);
+                });
+            }
+
+            // ================= Tab 2 按钮逻辑 =================
+            if (generateBtn2) {
+                generateBtn2.addEventListener('click', async () => {
+                    const omega1 = parseFloat(omega1Slider.value);
+                    const omega2 = parseFloat(omega2Slider.value);
+                    const g = parseFloat(gSlider.value);
+                    const gamma = parseFloat(gammaSlider.value);
+                    const theta = parseFloat(thetaSlider.value);
+                    const url = `./createImgQuantum?omega1=${omega1}&omega2=${omega2}&g=${g}&gamma=${gamma}&theta=${theta}&_=${Date.now()}`;
+                    setLoadingState(true, 2);
+                    statusMsg2.textContent = `计算中...`;
+                    await processImageRequest(url, imageContainer2, placeholderText2, loadingSpinner2, statusMsg2, 2);
+                });
+            }
+
+            // ================= Tab 3 按钮逻辑 (新增) =================
+            if (generateBtn3) {
+                generateBtn3.addEventListener('click', async () => {
+
+                    const eta = parseFloat(etaSlider.value);
+                    const t_end = parseFloat(tEndSlider.value);
+                    const B_factor = parseFloat(bFactorSlider.value); // 后端需处理 * np.pi
+                    const omega0 = parseFloat(omega0Slider.value);
+                    const mu = parseFloat(muSlider.value);
+                    const x_range_factor = parseFloat(xRangeSlider.value);
+
+                    // 固定点数，也可做成滑块
+                    const n_x_points = 100;
+                    const n_t_points = 1000;
+
+                    const url = `./createImgBayesian?eta=${eta}&t_end=${t_end}&B_factor=${B_factor}&omega0=${omega0}&mu=${mu}&x_range_factor=${x_range_factor}&n_x_points=${n_x_points}&n_t_points=${n_t_points}&_=${Date.now()}`;
+
+                    setLoadingState(true, 3);
+                    statusMsg3.textContent = `贝叶斯模拟计算中...`;
+                    statusMsg3.style.color = 'var(--accent-color)';
+                    console.log("发送请求");
+                    await processImageRequest(url, imageContainer3, placeholderText3, loadingSpinner3, statusMsg3, 3);
+                });
+            }
+
+            // ================= Tab 4 逻辑 =================
+            const bFactorSlider4 = document.getElementById('bFactorSlider4');
+            const bFactorValue4 = document.getElementById('bFactorValue4');
+            const omega0Slider4 = document.getElementById('omega0Slider4');
+            const omega0Value4 = document.getElementById('omega0Value4');
+            const xMinInput4 = document.getElementById('xMinInput4');
+            const xMinValue4 = document.getElementById('xMinValue4');
+            const xMaxInput4 = document.getElementById('xMaxInput4');
+            const xMaxValue4 = document.getElementById('xMaxValue4');
+            const tMaxSlider4 = document.getElementById('tMaxSlider4');
+            const tMaxValue4 = document.getElementById('tMaxValue4');
+            const yNumSlider4 = document.getElementById('yNumSlider4');
+            const yNumValue4 = document.getElementById('yNumValue4');
+            const seedSlider4 = document.getElementById('seedSlider4');
+            const seedValue4 = document.getElementById('seedValue4');
+            const probThreshSlider4 = document.getElementById('probThreshSlider4');
+            const probThreshValue4 = document.getElementById('probThreshValue4');
+
+            const generateBtn4 = document.getElementById('generateBtn4');
+            const imageContainer4 = document.getElementById('imageContainer4');
+            const placeholderText4 = document.getElementById('placeholderText4');
+            const loadingSpinner4 = document.getElementById('loadingSpinner4');
+            const statusMsg4 = document.getElementById('statusMsg4');
+
+            if (bFactorSlider4) {
+                updateDisplay4();
+                bFactorSlider4.addEventListener('input', updateDisplay4);
+                omega0Slider4.addEventListener('input', updateDisplay4);
+                xMinInput4.addEventListener('input', updateDisplay4);
+                xMaxInput4.addEventListener('input', updateDisplay4);
+                tMaxSlider4.addEventListener('input', updateDisplay4);
+                yNumSlider4.addEventListener('input', updateDisplay4);
+                seedSlider4.addEventListener('input', updateDisplay4);
+                probThreshSlider4.addEventListener('input', updateDisplay4);
+            }
+
+            function updateDisplay4() {
+                if (!bFactorSlider4) return;
+                const bVal = parseFloat(bFactorSlider4.value).toFixed(2);
+                bFactorValue4.textContent = `${bVal}π`;
+                omega0Value4.textContent = parseFloat(omega0Slider4.value).toFixed(2);
+                xMinValue4.textContent = parseFloat(xMinInput4.value).toFixed(2);
+                const xMaxVal = parseFloat(xMaxInput4.value).toFixed(2);
+                xMaxValue4.textContent = `${xMaxVal}π`;
+                tMaxValue4.textContent = parseFloat(tMaxSlider4.value).toFixed(2);
+                yNumValue4.textContent = parseInt(yNumSlider4.value);
+                seedValue4.textContent = parseInt(seedSlider4.value);
+                probThreshValue4.textContent = parseFloat(probThreshSlider4.value).toFixed(3);
+            }
+
+            if (generateBtn4) {
+                generateBtn4.addEventListener('click', async () => {
+                    const B_factor = parseFloat(bFactorSlider4.value);
+                    const omega0 = parseFloat(omega0Slider4.value);
+                    const x_min = parseFloat(xMinInput4.value);
+                    const x_max_factor = parseFloat(xMaxInput4.value);
+                    const t_max = parseFloat(tMaxSlider4.value);
+                    const y_num = parseInt(yNumSlider4.value);
+                    const seed = parseInt(seedSlider4.value);
+                    const prob_threshold = parseFloat(probThreshSlider4.value);
+
+                    const x_num = 1000;
+                    const t_num = 1000;
+
+                    const url = `./createImgQuantumParameter?B_factor=${B_factor}&omega0=${omega0}&x_min=${x_min}&x_max_factor=${x_max_factor}&x_num=${x_num}&t_max=${t_max}&t_num=${t_num}&y_num=${y_num}&seed=${seed}&prob_threshold=${prob_threshold}&_=${Date.now()}`;
+
+                    setLoadingState(true, 4);
+                    statusMsg4.textContent = `量子参数估计计算中...`;
+                    statusMsg4.style.color = 'var(--accent-color)';
+                    console.log("发送Tab4请求");
+                    await processImageRequest(url, imageContainer4, placeholderText4, loadingSpinner4, statusMsg4, 4);
+                });
+            }
+
+            // ================= Tab 5 逻辑 =================
+            const omegaSlider5 = document.getElementById('omegaSlider5');
+            const omegaValue5 = document.getElementById('omegaValue5');
+            const tEndSlider5 = document.getElementById('tEndSlider5');
+            const tEndValue5 = document.getElementById('tEndValue5');
+            const tPointsSlider5 = document.getElementById('tPointsSlider5');
+            const tPointsValue5 = document.getElementById('tPointsValue5');
+            const decay1Slider5 = document.getElementById('decay1Slider5');
+            const decay1Value5 = document.getElementById('decay1Value5');
+            const decay2Slider5 = document.getElementById('decay2Slider5');
+            const decay2Value5 = document.getElementById('decay2Value5');
+            const maxEpisodeSlider5 = document.getElementById('maxEpisodeSlider5');
+            const maxEpisodeValue5 = document.getElementById('maxEpisodeValue5');
+            const pNumSlider5 = document.getElementById('pNumSlider5');
+            const pNumValue5 = document.getElementById('pNumValue5');
+
+            const generateBtn5 = document.getElementById('generateBtn5');
+            const imageContainer5 = document.getElementById('imageContainer5');
+            const placeholderText5 = document.getElementById('placeholderText5');
+            const loadingSpinner5 = document.getElementById('loadingSpinner5');
+            const statusMsg5 = document.getElementById('statusMsg5');
+
+            if (omegaSlider5) {
+                updateDisplay5();
+                omegaSlider5.addEventListener('input', updateDisplay5);
+                tEndSlider5.addEventListener('input', updateDisplay5);
+                tPointsSlider5.addEventListener('input', updateDisplay5);
+                decay1Slider5.addEventListener('input', updateDisplay5);
+                decay2Slider5.addEventListener('input', updateDisplay5);
+                maxEpisodeSlider5.addEventListener('input', updateDisplay5);
+                pNumSlider5.addEventListener('input', updateDisplay5);
+            }
+
+            function updateDisplay5() {
+                if (!omegaSlider5) return;
+                omegaValue5.textContent = parseFloat(omegaSlider5.value).toFixed(2);
+                tEndValue5.textContent = parseInt(tEndSlider5.value);
+                tPointsValue5.textContent = parseInt(tPointsSlider5.value);
+                decay1Value5.textContent = parseFloat(decay1Slider5.value).toFixed(2);
+                decay2Value5.textContent = parseFloat(decay2Slider5.value).toFixed(2);
+                maxEpisodeValue5.textContent = parseInt(maxEpisodeSlider5.value);
+                pNumValue5.textContent = parseInt(pNumSlider5.value);
+            }
+
+            if (generateBtn5) {
+                generateBtn5.addEventListener('click', async () => {
+                    const omega = parseFloat(omegaSlider5.value);
+                    const t_end = parseInt(tEndSlider5.value);
+                    const t_points = parseInt(tPointsSlider5.value);
+                    const decay_rate_1 = parseFloat(decay1Slider5.value);
+                    const decay_rate_2 = parseFloat(decay2Slider5.value);
+                    const max_episode = parseInt(maxEpisodeSlider5.value);
+                    const p_num = parseInt(pNumSlider5.value);
+
+                    const url = `./createImgProjection?omega=${omega}&t_end=${t_end}&t_points=${t_points}&decay_rate_1=${decay_rate_1}&decay_rate_2=${decay_rate_2}&max_episode=${max_episode}&p_num=${p_num}&_=${Date.now()}`;
+
+                    setLoadingState(true, '5');
+                    statusMsg5.textContent = `投影测量优化计算中...`;
+                    statusMsg5.style.color = 'var(--accent-color)';
+                    console.log("发送Tab5请求");
+                    await processImageRequest(url, imageContainer5, placeholderText5, loadingSpinner5, statusMsg5, '5');
+                });
+            }
+
+            // ================= Tab 5-2 逻辑 (LC输入测量) =================
+            const omegaSlider5_2 = document.getElementById('omegaSlider5_2');
+            const omegaValue5_2 = document.getElementById('omegaValue5_2');
+            const tEndSlider5_2 = document.getElementById('tEndSlider5_2');
+            const tEndValue5_2 = document.getElementById('tEndValue5_2');
+            const tPointsSlider5_2 = document.getElementById('tPointsSlider5_2');
+            const tPointsValue5_2 = document.getElementById('tPointsValue5_2');
+            const decay1Slider5_2 = document.getElementById('decay1Slider5_2');
+            const decay1Value5_2 = document.getElementById('decay1Value5_2');
+            const decay2Slider5_2 = document.getElementById('decay2Slider5_2');
+            const decay2Value5_2 = document.getElementById('decay2Value5_2');
+            const maxEpisodeSlider5_2 = document.getElementById('maxEpisodeSlider5_2');
+            const maxEpisodeValue5_2 = document.getElementById('maxEpisodeValue5_2');
+            const pNumSlider5_2 = document.getElementById('pNumSlider5_2');
+            const pNumValue5_2 = document.getElementById('pNumValue5_2');
+
+            const generateBtn5_2 = document.getElementById('generateBtn5_2');
+            const imageContainer5_2 = document.getElementById('imageContainer5_2');
+            const placeholderText5_2 = document.getElementById('placeholderText5_2');
+            const loadingSpinner5_2 = document.getElementById('loadingSpinner5_2');
+            const statusMsg5_2 = document.getElementById('statusMsg5_2');
+
+            if (omegaSlider5_2) {
+                updateDisplay5_2();
+                omegaSlider5_2.addEventListener('input', updateDisplay5_2);
+                tEndSlider5_2.addEventListener('input', updateDisplay5_2);
+                tPointsSlider5_2.addEventListener('input', updateDisplay5_2);
+                decay1Slider5_2.addEventListener('input', updateDisplay5_2);
+                decay2Slider5_2.addEventListener('input', updateDisplay5_2);
+                maxEpisodeSlider5_2.addEventListener('input', updateDisplay5_2);
+                pNumSlider5_2.addEventListener('input', updateDisplay5_2);
+            }
+
+            function updateDisplay5_2() {
+                if (!omegaSlider5_2) return;
+                omegaValue5_2.textContent = parseFloat(omegaSlider5_2.value).toFixed(2);
+                tEndValue5_2.textContent = parseInt(tEndSlider5_2.value);
+                tPointsValue5_2.textContent = parseInt(tPointsSlider5_2.value);
+                decay1Value5_2.textContent = parseFloat(decay1Slider5_2.value).toFixed(2);
+                decay2Value5_2.textContent = parseFloat(decay2Slider5_2.value).toFixed(2);
+                maxEpisodeValue5_2.textContent = parseInt(maxEpisodeSlider5_2.value);
+                pNumValue5_2.textContent = parseInt(pNumSlider5_2.value);
+            }
+
+            if (generateBtn5_2) {
+                generateBtn5_2.addEventListener('click', async () => {
+                    const omega = parseFloat(omegaSlider5_2.value);
+                    const t_end = parseInt(tEndSlider5_2.value);
+                    const t_points = parseInt(tPointsSlider5_2.value);
+                    const decay_rate_1 = parseFloat(decay1Slider5_2.value);
+                    const decay_rate_2 = parseFloat(decay2Slider5_2.value);
+                    const max_episode = parseInt(maxEpisodeSlider5_2.value);
+                    const p_num = parseInt(pNumSlider5_2.value);
+
+                    const url = `./createImgLCInput?omega=${omega}&t_end=${t_end}&t_points=${t_points}&decay_rate_1=${decay_rate_1}&decay_rate_2=${decay_rate_2}&max_episode=${max_episode}&p_num=${p_num}&_=${Date.now()}`;
+
+                    setLoadingState(true, '5_2');
+                    statusMsg5_2.textContent = `LC输入测量优化计算中...`;
+                    statusMsg5_2.style.color = 'var(--accent-color)';
+                    console.log("发送Tab5-2请求");
+                    await processImageRequest(url, imageContainer5_2, placeholderText5_2, loadingSpinner5_2, statusMsg5_2, '5_2');
+                });
+            }
+
+            // ================= Tab 5-3 逻辑 (旋转输入测量) =================
+            const omegaSlider5_3 = document.getElementById('omegaSlider5_3');
+            const omegaValue5_3 = document.getElementById('omegaValue5_3');
+            const tEndSlider5_3 = document.getElementById('tEndSlider5_3');
+            const tEndValue5_3 = document.getElementById('tEndValue5_3');
+            const tPointsSlider5_3 = document.getElementById('tPointsSlider5_3');
+            const tPointsValue5_3 = document.getElementById('tPointsValue5_3');
+            const decay1Slider5_3 = document.getElementById('decay1Slider5_3');
+            const decay1Value5_3 = document.getElementById('decay1Value5_3');
+            const decay2Slider5_3 = document.getElementById('decay2Slider5_3');
+            const decay2Value5_3 = document.getElementById('decay2Value5_3');
+            const maxEpisodeSlider5_3 = document.getElementById('maxEpisodeSlider5_3');
+            const maxEpisodeValue5_3 = document.getElementById('maxEpisodeValue5_3');
+            const pNumSlider5_3 = document.getElementById('pNumSlider5_3');
+            const pNumValue5_3 = document.getElementById('pNumValue5_3');
+
+            const generateBtn5_3 = document.getElementById('generateBtn5_3');
+            const imageContainer5_3 = document.getElementById('imageContainer5_3');
+            const placeholderText5_3 = document.getElementById('placeholderText5_3');
+            const loadingSpinner5_3 = document.getElementById('loadingSpinner5_3');
+            const statusMsg5_3 = document.getElementById('statusMsg5_3');
+
+            if (omegaSlider5_3) {
+                updateDisplay5_3();
+                omegaSlider5_3.addEventListener('input', updateDisplay5_3);
+                tEndSlider5_3.addEventListener('input', updateDisplay5_3);
+                tPointsSlider5_3.addEventListener('input', updateDisplay5_3);
+                decay1Slider5_3.addEventListener('input', updateDisplay5_3);
+                decay2Slider5_3.addEventListener('input', updateDisplay5_3);
+                maxEpisodeSlider5_3.addEventListener('input', updateDisplay5_3);
+                pNumSlider5_3.addEventListener('input', updateDisplay5_3);
+            }
+
+            function updateDisplay5_3() {
+                if (!omegaSlider5_3) return;
+                omegaValue5_3.textContent = parseFloat(omegaSlider5_3.value).toFixed(2);
+                tEndValue5_3.textContent = parseInt(tEndSlider5_3.value);
+                tPointsValue5_3.textContent = parseInt(tPointsSlider5_3.value);
+                decay1Value5_3.textContent = parseFloat(decay1Slider5_3.value).toFixed(2);
+                decay2Value5_3.textContent = parseFloat(decay2Slider5_3.value).toFixed(2);
+                maxEpisodeValue5_3.textContent = parseInt(maxEpisodeSlider5_3.value);
+                pNumValue5_3.textContent = parseInt(pNumSlider5_3.value);
+            }
+
+            if (generateBtn5_3) {
+                generateBtn5_3.addEventListener('click', async () => {
+                    const omega = parseFloat(omegaSlider5_3.value);
+                    const t_end = parseInt(tEndSlider5_3.value);
+                    const t_points = parseInt(tPointsSlider5_3.value);
+                    const decay_rate_1 = parseFloat(decay1Slider5_3.value);
+                    const decay_rate_2 = parseFloat(decay2Slider5_3.value);
+                    const max_episode = parseInt(maxEpisodeSlider5_3.value);
+                    const p_num = parseInt(pNumSlider5_3.value);
+
+                    const url = `./createImgRotationInput?omega=${omega}&t_end=${t_end}&t_points=${t_points}&decay_rate_1=${decay_rate_1}&decay_rate_2=${decay_rate_2}&max_episode=${max_episode}&p_num=${p_num}&_=${Date.now()}`;
+
+                    setLoadingState(true, '5_3');
+                    statusMsg5_3.textContent = `旋转输入测量优化计算中...`;
+                    statusMsg5_3.style.color = 'var(--accent-color)';
+                    console.log("发送Tab5-3请求");
+                    await processImageRequest(url, imageContainer5_3, placeholderText5_3, loadingSpinner5_3, statusMsg5_3, '5_3');
+                });
+            }
+
+            // ================= Tab 6 逻辑 =================
+            const nSlider6 = document.getElementById('nSlider6');
+            const nValue6 = document.getElementById('nValue6');
+            const lambdaSlider6 = document.getElementById('lambdaSlider6');
+            const lambdaValue6 = document.getElementById('lambdaValue6');
+            const gSlider6 = document.getElementById('gSlider6');
+            const gValue6 = document.getElementById('gValue6');
+            const hSlider6 = document.getElementById('hSlider6');
+            const hValue6 = document.getElementById('hValue6');
+            const decaySlider6 = document.getElementById('decaySlider6');
+            const decayValue6 = document.getElementById('decayValue6');
+            const tMaxSlider6 = document.getElementById('tMaxSlider6');
+            const tMaxValue6 = document.getElementById('tMaxValue6');
+            const maxEpisodeSlider6 = document.getElementById('maxEpisodeSlider6');
+            const maxEpisodeValue6 = document.getElementById('maxEpisodeValue6');
+            const epsilonSlider6 = document.getElementById('epsilonSlider6');
+            const epsilonValue6 = document.getElementById('epsilonValue6');
+
+            const generateBtn6 = document.getElementById('generateBtn6');
+            const imageContainer6 = document.getElementById('imageContainer6');
+            const placeholderText6 = document.getElementById('placeholderText6');
+            const loadingSpinner6 = document.getElementById('loadingSpinner6');
+            const statusMsg6 = document.getElementById('statusMsg6');
+
+            if (nSlider6) {
+                updateDisplay6();
+                nSlider6.addEventListener('input', updateDisplay6);
+                lambdaSlider6.addEventListener('input', updateDisplay6);
+                gSlider6.addEventListener('input', updateDisplay6);
+                hSlider6.addEventListener('input', updateDisplay6);
+                decaySlider6.addEventListener('input', updateDisplay6);
+                tMaxSlider6.addEventListener('input', updateDisplay6);
+                maxEpisodeSlider6.addEventListener('input', updateDisplay6);
+                epsilonSlider6.addEventListener('input', updateDisplay6);
+            }
+
+            function updateDisplay6() {
+                if (!nSlider6) return;
+                nValue6.textContent = parseInt(nSlider6.value);
+                lambdaValue6.textContent = parseFloat(lambdaSlider6.value).toFixed(2);
+                gValue6.textContent = parseFloat(gSlider6.value).toFixed(2);
+                hValue6.textContent = parseFloat(hSlider6.value).toFixed(2);
+                decayValue6.textContent = parseFloat(decaySlider6.value).toFixed(2);
+                tMaxValue6.textContent = parseFloat(tMaxSlider6.value).toFixed(1);
+                maxEpisodeValue6.textContent = parseInt(maxEpisodeSlider6.value);
+                epsilonValue6.textContent = parseFloat(epsilonSlider6.value).toFixed(3);
+            }
+
+            if (generateBtn6) {
+                generateBtn6.addEventListener('click', async () => {
+                    const N = parseInt(nSlider6.value);
+                    const Lambda = parseFloat(lambdaSlider6.value);
+                    const g = parseFloat(gSlider6.value);
+                    const h = parseFloat(hSlider6.value);
+                    const decay_rate = parseFloat(decaySlider6.value);
+                    const t_max = parseFloat(tMaxSlider6.value);
+                    const max_episode = parseInt(maxEpisodeSlider6.value);
+                    const epsilon = parseFloat(epsilonSlider6.value);
+
+                    const n_points = 2500;
+                    const beta1 = 0.90;
+                    const beta2 = 0.99;
+                    const use_adam = false;
+
+                    const url = `./createImgStateOpt?N=${N}&Lambda=${Lambda}&g=${g}&h=${h}&decay_rate=${decay_rate}&t_max=${t_max}&n_points=${n_points}&max_episode=${max_episode}&epsilon=${epsilon}&beta1=${beta1}&beta2=${beta2}&use_adam=${use_adam}&_=${Date.now()}`;
+
+                    setLoadingState(true, 6);
+                    statusMsg6.textContent = `状态优化计算中...`;
+                    statusMsg6.style.color = 'var(--accent-color)';
+                    console.log("发送Tab6请求");
+                    
+                    try {
+                        const response = await fetch(url);
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        const data = await response.json();
+                        
+                        const img1 = document.createElement('img');
+                        img1.src = data.image1;
+                        img1.alt = 'QFI收敛曲线';
+                        
+                        const img2 = document.createElement('img');
+                        img2.src = data.image2;
+                        img2.alt = '最优态分布直方图';
+                        
+                        imageContainer6.innerHTML = '';
+                        imageContainer6.appendChild(img1);
+                        
+                        const imageContainer6Second = document.getElementById('imageContainer6Second');
+                        imageContainer6Second.innerHTML = '';
+                        imageContainer6Second.appendChild(img2);
+                        
+                        statusMsg6.textContent = '生成完成！';
+                        statusMsg6.style.color = '#00ff88';
+                    } catch (error) {
+                        console.error('Error:', error);
+                        statusMsg6.textContent = `错误: ${error.message}`;
+                        statusMsg6.style.color = '#ff4444';
+                    } finally {
+                        setLoadingState(false, 6);
+                    }
+                });
+            }
+        });
+
+        // Tab 切换逻辑
+        function openTab(evt, tabName) {
+            var i, tabContent, tabBtns;
+            tabContent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabContent.length; i++) {
+                tabContent[i].style.display = "none";
+                tabContent[i].classList.remove("active");
+            }
+            tabBtns = document.getElementsByClassName("tab-btn");
+            for (i = 0; i < tabBtns.length; i++) {
+                tabBtns[i].className = tabBtns[i].className.replace(" active", "");
+            }
+            document.getElementById(tabName).style.display = "block";
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.className += " active";
+        }
+
+        // ================= Tab5 下拉菜单逻辑 =================
+        let tab5DropdownTimer = null;
+
+        function showTab5Dropdown() {
+            if (tab5DropdownTimer) {
+                clearTimeout(tab5DropdownTimer);
+                tab5DropdownTimer = null;
+            }
+            const dropdown = document.getElementById('tab5Dropdown');
+            const wrapper = document.querySelector('.tab-dropdown-wrapper');
+            if (dropdown) {
+                dropdown.classList.add('show');
+            }
+            if (wrapper) {
+                wrapper.classList.add('expanded');
+            }
+        }
+
+        function hideTab5Dropdown() {
+            tab5DropdownTimer = setTimeout(() => {
+                const dropdown = document.getElementById('tab5Dropdown');
+                const wrapper = document.querySelector('.tab-dropdown-wrapper');
+                if (dropdown) {
+                    dropdown.classList.remove('show');
+                }
+                if (wrapper) {
+                    wrapper.classList.remove('expanded');
+                }
+            }, 150);
+        }
+
+        function keepTab5Dropdown() {
+            if (tab5DropdownTimer) {
+                clearTimeout(tab5DropdownTimer);
+                tab5DropdownTimer = null;
+            }
+        }
+
+        function openSubTab5(evt, subTabName) {
+            var i, subTabContent, subTabItems;
+            
+            subTabContent = document.getElementsByClassName("tab5-sub-content");
+            for (i = 0; i < subTabContent.length; i++) {
+                subTabContent[i].classList.remove("active");
+            }
+            
+            subTabItems = document.querySelectorAll("#tab5Dropdown .tab-dropdown-item");
+            for (i = 0; i < subTabItems.length; i++) {
+                subTabItems[i].classList.remove("active");
+            }
+            
+            document.getElementById(subTabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+            
+            var tabContent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabContent.length; i++) {
+                tabContent[i].style.display = "none";
+                tabContent[i].classList.remove("active");
+            }
+            document.getElementById('tab5').style.display = "block";
+            document.getElementById('tab5').classList.add("active");
+            
+            var tabBtns = document.getElementsByClassName("tab-btn");
+            for (i = 0; i < tabBtns.length; i++) {
+                tabBtns[i].classList.remove("active");
+            }
+            var trigger = document.querySelector('.tab-dropdown-trigger');
+            if (trigger) {
+                trigger.classList.add("active");
+            }
+        }
+
+        // ================= 弹窗功能 =================
+        const modalOverlay = document.createElement('div');
+        modalOverlay.className = 'modal-overlay';
+        modalOverlay.innerHTML = `
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span class="modal-title">原理文档</span>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <iframe id="docFrame" src=""></iframe>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modalOverlay);
+
+        const modalClose = modalOverlay.querySelector('.modal-close');
+        const docFrame = modalOverlay.querySelector('#docFrame');
+
+        function openModal(docPath) {
+            docFrame.src = docPath;
+            modalOverlay.classList.add('active');
+        }
+
+        function closeModal() {
+            modalOverlay.classList.remove('active');
+            setTimeout(() => {
+                docFrame.src = '';
+            }, 300);
+        }
+
+        modalClose.addEventListener('click', closeModal);
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) {
+                closeModal();
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        // 为所有"查看原理"按钮添加点击事件
+        document.querySelectorAll('.preview-document').forEach((btn, index) => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                let tabId = index + 1;
+                if (tabId === 5 || tabId === 6 || tabId === 7) {
+                    tabId = 5;
+                } else if (tabId === 8) {
+                    tabId = 6;
+                }
+                const docPath = `./Doc/${tabId}.html`;
+                openModal(docPath);
+            });
+        });
+    </script>
+</body>
+
+</html>

@@ -1,4 +1,4 @@
-# Tutorial for QuanEstimation
+# QuanEstimation Education
 
 An educational web application demonstrating quantum parameter estimation techniques, built on top of the [QuanEstimation](https://github.com/QuanEstimation/QuanEstimation) library.
 

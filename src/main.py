@@ -3,19 +3,20 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, FileResponse, JSONResponse
 import numpy as np
 import time
-import Cam  # 假设你的 MakeImg 在 Cam.py 中
+import os
+import quantum_estimation
 # 引入量子估计函数
-from Cam import run_quantum_estimation 
-# 【新增】引入贝叶斯估计函数，假设该函数定义在 quantum_estimation.py 或 Cam.py 中
-from Cam import run_bayesian_quantum_estimation
-# 引入量子参数估计函数
-from Cam import run_quantum_parameter_estimation
-# 引入测量优化函数 (三个子函数)
-from Cam import run_projection_measurement, run_lc_input_measurement, run_rotation_input_measurement
-# 引入状态优化函数
-from Cam import run_state_optimization
+from quantum_estimation import run_quantum_estimation 
+from quantum_estimation import run_bayesian_quantum_estimation
+from quantum_estimation import run_quantum_parameter_estimation
+from quantum_estimation import run_projection_measurement, run_lc_input_measurement, run_rotation_input_measurement
+from quantum_estimation import run_state_optimization
 
 app = FastAPI()
+
+# 自动创建必要文件夹
+os.makedirs("./Img", exist_ok=True)
+os.makedirs("./Doc", exist_ok=True)
 
 # 挂载静态文件 (保持不变)
 app.mount("/Img", StaticFiles(directory="./Img"), name="Img")
@@ -35,7 +36,7 @@ async def create_img(
     
     
     # 2. 调用修改后的 MakeImg 函数
-    imgname = Cam.MakeImg(omega=omega, tspan=tspan, cam=cam)
+    imgname = quantum_estimation.MakeImg(omega=omega, tspan=tspan, cam=cam)
     
     # 3. 返回 HTML 图片标签
     imgsrc = f"/Img/{imgname}"

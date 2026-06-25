@@ -553,13 +553,58 @@
         .tab5-sub-content.active {
             display: block;
         }
+
+        .lang-switch {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 10000;
+            display: flex;
+            gap: 8px;
+            background: rgba(21, 25, 43, 0.95);
+            border: 1px solid var(--accent-color);
+            border-radius: 25px;
+            padding: 6px;
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .lang-btn {
+            padding: 8px 16px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            font-family: var(--font-sans);
+        }
+
+        .lang-btn:hover {
+            color: var(--accent-color);
+            background: rgba(0, 242, 255, 0.1);
+        }
+
+        .lang-btn.active {
+            background: var(--accent-color);
+            color: var(--bg-color);
+            font-weight: 600;
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
     </style>
 </head>
 
 <body>
+    <div class="lang-switch">
+        <button class="lang-btn active" data-lang="zh">中文</button>
+        <button class="lang-btn" data-lang="en">English</button>
+    </div>
+
     <div
         style="padding: 10px 15px 8px 15px;position: relative;box-shadow: 0 0 10px #00f2ff;display: flex;align-items: center;background-color: #0a0c18;z-index: 999;">
-        <div style="color: var(--accent-color);font-size: 1.75rem;font-weight: bold;">QuanEstimation 量子参数估计可视化系统</div>
+        <div data-zh="QuanEstimation 量子参数估计可视化系统" data-en="QuanEstimation Quantum Parameter Estimation Visualization System" style="color: var(--accent-color);font-size: 1.75rem;font-weight: bold;">QuanEstimation 量子参数估计可视化系统</div>
   
     </div>
 
@@ -567,22 +612,20 @@
         <!-- 左侧侧边栏 -->
         <div class="sidebar">
             <button class="tab-btn active" onclick="openTab(event, 'tab1')">
-                <div>单量子比特参数估计</div>
+                <div data-zh="单量子比特参数估计" data-en="Single Qubit Parameter Estimation">单量子比特参数估计</div>
                 <div style="font-size: 0.6rem;color: #ffffff70;font-weight: normal;">CramerRao_bounds</div>
             </button>
             <button class="tab-btn" onclick="openTab(event, 'tab2')">
-                <div>双量子比特参数估计</div>
+                <div data-zh="双量子比特参数估计" data-en="Two Qubit Parameter Estimation">双量子比特参数估计</div>
                 <div style="font-size: 0.6rem;color: #ffffff70;font-weight: normal;">HCRB_NHB</div>                
             </button>
-            <!-- Tab 3 按钮 -->
             <button class="tab-btn" onclick="openTab(event, 'tab3')">
-                <div style="max-width: 160px;overflow-x: hidden;">贝叶斯参数估计</div>
+                <div style="max-width: 160px;overflow-x: hidden;" data-zh="贝叶斯参数估计" data-en="Bayesian Parameter Estimation">贝叶斯参数估计</div>
                 <div style="font-size: 0.6rem;color: #ffffff70;font-weight: normal;">Bayesian_CramerRao_bounds</div>
             </button>
-            <!-- Tab 4 按钮 -->
             <button class="tab-btn" onclick="openTab(event, 'tab4')">
                 <div style="max-width: 160px;overflow-x: hidden;">
-                    <div style="max-width: 180px;min-width: 180px;">贝叶斯与最大似然估计</div>
+                    <div style="max-width: 180px;min-width: 180px;" data-zh="贝叶斯与最大似然估计" data-en="Bayesian and Maximum Likelihood Estimation">贝叶斯与最大似然估计</div>
                 </div>
                 <div style="font-size: 0.6rem;color: #ffffff70;font-weight: normal;">Quantum_Parameter_Estimation</div>
             </button>
@@ -590,21 +633,20 @@
             <div class="tab-dropdown-wrapper">
                 <button class="tab-btn tab-dropdown-trigger" onmouseenter="showTab5Dropdown()" onmouseleave="hideTab5Dropdown()">
                     <div style="max-width: 160px;overflow-x: hidden;">
-                        <div style="max-width: 180px;min-width: 180px;">测量优化算法</div>
+                        <div style="max-width: 180px;min-width: 180px;" data-zh="测量优化算法" data-en="Measurement Optimization Algorithm">测量优化算法</div>
                     </div>
                     <div style="font-size: 0.6rem;color: #ffffff70;font-weight: normal;">Measurement_Optimization</div>
                     <span class="dropdown-arrow">▼</span>
                 </button>
                 <div class="tab-dropdown-menu" id="tab5Dropdown" onmouseenter="keepTab5Dropdown()" onmouseleave="hideTab5Dropdown()">
-                    <button class="tab-dropdown-item active" onclick="openSubTab5(event, 'tab5-1')">投影测量</button>
-                    <button class="tab-dropdown-item" onclick="openSubTab5(event, 'tab5-2')">LC输入测量</button>
-                    <button class="tab-dropdown-item" onclick="openSubTab5(event, 'tab5-3')">旋转输入测量</button>
+                    <button class="tab-dropdown-item active" onclick="openSubTab5(event, 'tab5-1')" data-zh="投影测量" data-en="Projection Measurement">投影测量</button>
+                    <button class="tab-dropdown-item" onclick="openSubTab5(event, 'tab5-2')" data-zh="LC输入测量" data-en="LC Input Measurement">LC输入测量</button>
+                    <button class="tab-dropdown-item" onclick="openSubTab5(event, 'tab5-3')" data-zh="旋转输入测量" data-en="Rotation Input Measurement">旋转输入测量</button>
                 </div>
             </div>
-            <!-- Tab 6 按钮 -->
             <button class="tab-btn" onclick="openTab(event, 'tab6')">
                 <div style="max-width: 160px;overflow-x: hidden;">
-                    <div style="max-width: 180px;min-width: 180px;">LMG模型的态优化</div>
+                    <div style="max-width: 180px;min-width: 180px;" data-zh="LMG模型的态优化" data-en="State Optimization of LMG Model">LMG模型的态优化</div>
                 </div>
                 <div style="font-size: 0.6rem;color: #ffffff70;font-weight: normal;">State_Optimization</div>
             </button>
@@ -617,16 +659,16 @@
             <div id="tab1" class="tab-content active">
                 <div class="intro">
                     <div style="position: relative;display: flex;align-items: center;">
-                        <h1>单量子比特参数估计</h1>
-                        <button class="btn-generate preview-document">查看原理</button>
+                        <h1 data-zh="单量子比特参数估计" data-en="Single Qubit Parameter Estimation">单量子比特参数估计</h1>
+                        <button class="btn-generate preview-document" data-zh="查看原理" data-en="View Principles">查看原理</button>
                     </div>
-                    <p>基于 QuanEstimation 库，模拟单粒子系统中的量子费舍尔信息（QFI）和经典费舍尔信息（CFI）的 演化。</p>
+                    <p data-zh="基于 QuanEstimation 库，模拟单粒子系统中的量子费舍尔信息（QFI）和经典费舍尔信息（CFI）的 演化。" data-en="Based on QuanEstimation library, simulate the evolution of Quantum Fisher Information (QFI) and Classical Fisher Information (CFI) in single-particle systems.">基于 QuanEstimation 库，模拟单粒子系统中的量子费舍尔信息（QFI）和经典费舍尔信息（CFI）的 演化。</p>
                 </div>
                 <div class="container">
                     <div class="control-panel">
                         <div class="param-group">
-                            <h2>系统频率</h2>
-                            <p class="param-desc">ω: 调节系统哈密顿量的本征频率</p>
+                            <h2 data-zh="系统频率" data-en="System Frequency">系统频率</h2>
+                            <p class="param-desc" data-zh="ω: 调节系统哈密顿量的本征频率" data-en="ω: Adjust the eigenfrequency of the system Hamiltonian">ω: 调节系统哈密顿量的本征频率</p>
                             <div class="slider-group">
                                 <div class="label-row"><span>LOW</span><span id="omegaValue"
                                         class="value-display">1.00</span></div>
@@ -635,8 +677,8 @@
                             </div>
                         </div>
                         <div class="param-group">
-                            <h2>演化时间</h2>
-                            <p class="param-desc">t: 设置系统演化的最大时间点</p>
+                            <h2 data-zh="演化时间" data-en="Evolution Time">演化时间</h2>
+                            <p class="param-desc" data-zh="t: 设置系统演化的最大时间点" data-en="t: Set the maximum time point of system evolution">t: 设置系统演化的最大时间点</p>
                             <div class="slider-group">
                                 <div class="label-row"><span>SHORT</span><span id="timeValue"
                                         class="value-display">50</span></div>
@@ -645,8 +687,8 @@
                             </div>
                         </div>
                         <div class="param-group">
-                            <h2>耗散系数</h2>
-                            <p class="param-desc">γ: 调节环境对系统的耗散强度</p>
+                            <h2 data-zh="耗散系数" data-en="Dissipation Coefficient">耗散系数</h2>
+                            <p class="param-desc" data-zh="γ: 调节环境对系统的耗散强度" data-en="γ: Adjust the dissipation intensity of the environment on the system">γ: 调节环境对系统的耗散强度</p>
                             <div class="slider-group">
                                 <div class="label-row"><span>Weak</span><span id="camValue"
                                         class="value-display">0.5</span></div>
@@ -654,14 +696,14 @@
                                 <div class="label-row" style="font-size: 0.7rem;"><span>0.1</span><span>2.0</span></div>
                             </div>
                         </div>
-                        <button id="generateBtn" class="btn-generate">生成图像</button>
+                        <button id="generateBtn" class="btn-generate" data-zh="生成图像" data-en="Generate Image">生成图像</button>
                         <div id="statusMsg"
                             style="font-size: 0.8rem; color: var(--text-secondary); font-family: var(--font-mono); height: 1.2em; text-align: center; margin-top: 10px;">
                         </div>
                     </div>
                     <div class="display-panel">
                         <div class="image-container" id="imageContainer">
-                            <div class="placeholder-text" id="placeholderText">[ 准备就绪 ]<br>调整参数并点击生成</div>
+                            <div class="placeholder-text" id="placeholderText" data-zh="[ 准备就绪 ]<br>调整参数并点击生成" data-en="[ Ready ]<br>Adjust parameters and click generate">[ 准备就绪 ]<br>调整参数并点击生成</div>
                             <div class="loading-spinner" id="loadingSpinner"></div>
                         </div>
                     </div>
@@ -672,15 +714,15 @@
             <div id="tab2" class="tab-content">
                 <div class="intro">
                     <div style="position: relative;display: flex;align-items: center;">
-                        <h1>双量子比特参数估计</h1>
-                        <button class="btn-generate preview-document">查看原理</button>
+                        <h1 data-zh="双量子比特参数估计" data-en="Two Qubit Parameter Estimation">双量子比特参数估计</h1>
+                        <button class="btn-generate preview-document" data-zh="查看原理" data-en="View Principles">查看原理</button>
                     </div>
-                    <p>基于 QuanEstimation 库，模拟双粒子系统中的 CFI/QFI 演化及 HCRB/NHB 边界。</p>
+                    <p data-zh="基于 QuanEstimation 库，模拟双粒子系统中的 CFI/QFI 演化及 HCRB/NHB 边界。" data-en="Based on QuanEstimation library, simulate CFI/QFI evolution and HCRB/NHB bounds in two-particle systems.">基于 QuanEstimation 库，模拟双粒子系统中的 CFI/QFI 演化及 HCRB/NHB 边界。</p>
                 </div>
                 <div class="container">
                     <div class="control-panel">
                         <div class="param-group">
-                            <h2>粒子1频率</h2>
+                            <h2 data-zh="粒子1频率" data-en="Particle 1 Frequency">粒子1频率</h2>
                             <div class="slider-group">
                                 <div class="label-row"><span>LOW</span><span id="omega1Value"
                                         class="value-display">1.0</span></div>
@@ -688,7 +730,7 @@
                             </div>
                         </div>
                         <div class="param-group">
-                            <h2>粒子2频率</h2>
+                            <h2 data-zh="粒子2频率" data-en="Particle 2 Frequency">粒子2频率</h2>
                             <div class="slider-group">
                                 <div class="label-row"><span>LOW</span><span id="omega2Value"
                                         class="value-display">1.0</span></div>
@@ -696,7 +738,7 @@
                             </div>
                         </div>
                         <div class="param-group">
-                            <h2>耦合强度</h2>
+                            <h2 data-zh="耦合强度" data-en="Coupling Strength">耦合强度</h2>
                             <div class="slider-group">
                                 <div class="label-row"><span>WEAK</span><span id="gValue"
                                         class="value-display">0.1</span></div>
@@ -704,7 +746,7 @@
                             </div>
                         </div>
                         <div class="param-group">
-                            <h2>耗散速率</h2>
+                            <h2 data-zh="耗散速率" data-en="Dissipation Rate">耗散速率</h2>
                             <div class="slider-group">
                                 <div class="label-row"><span>LOW</span><span id="gammaValue"
                                         class="value-display">0.05</span></div>
@@ -712,21 +754,21 @@
                             </div>
                         </div>
                         <div class="param-group">
-                            <h2>初始态角度</h2>
+                            <h2 data-zh="初始态角度" data-en="Initial State Angle">初始态角度</h2>
                             <div class="slider-group">
                                 <div class="label-row"><span>0</span><span id="thetaValue"
                                         class="value-display">0.79</span></div>
                                 <input type="range" id="thetaSlider" min="0" max="1.57" step="0.01" value="0.79">
                             </div>
                         </div>
-                        <button id="generateBtn2" class="btn-generate">生成分析图</button>
+                        <button id="generateBtn2" class="btn-generate" data-zh="生成分析图" data-en="Generate Analysis">生成分析图</button>
                         <div id="statusMsg2"
                             style="font-size: 0.8rem; color: var(--text-secondary); font-family: var(--font-mono); height: 1.2em; text-align: center; margin-top: 10px;">
                         </div>
                     </div>
                     <div class="display-panel">
                         <div class="image-container" id="imageContainer2">
-                            <div class="placeholder-text" id="placeholderText2">[ 准备就绪 ]<br>调整双量子比特参数并点击生成</div>
+                            <div class="placeholder-text" id="placeholderText2" data-zh="[ 准备就绪 ]<br>调整双量子比特参数并点击生成" data-en="[ Ready ]<br>Adjust two-qubit parameters and click generate">[ 准备就绪 ]<br>调整双量子比特参数并点击生成</div>
                             <div class="loading-spinner" id="loadingSpinner2"></div>
                         </div>
                     </div>
@@ -737,17 +779,16 @@
             <div id="tab3" class="tab-content">
                 <div class="intro">
                     <div style="position: relative;display: flex;align-items: center;">
-                        <h1>贝叶斯量子参数估计</h1>
-                        <button class="btn-generate preview-document">查看原理</button>
+                        <h1 data-zh="贝叶斯量子参数估计" data-en="Bayesian Quantum Parameter Estimation">贝叶斯量子参数估计</h1>
+                        <button class="btn-generate preview-document" data-zh="查看原理" data-en="View Principles">查看原理</button>
                     </div>
-                    <p>模拟贝叶斯框架下的量子参数估计过程，分析先验分布、演化时间及磁场强度对状态敏感度和布洛赫矢量的影响。</p>
+                    <p data-zh="模拟贝叶斯框架下的量子参数估计过程，分析先验分布、演化时间及磁场强度对状态敏感度和布洛赫矢量的影响。" data-en="Simulate quantum parameter estimation under the Bayesian framework, analyzing the effects of prior distribution, evolution time, and magnetic field strength on state sensitivity and Bloch vector.">模拟贝叶斯框架下的量子参数估计过程，分析先验分布、演化时间及磁场强度对状态敏感度和布洛赫矢量的影响。</p>
                 </div>
                 <div class="container">
                     <div class="control-panel">
-                        <!-- 参数 1: eta (先验标准差) -->
                         <div class="param-group">
-                            <h2>先验不确定度 (η)</h2>
-                            <p class="param-desc">先验分布的标准差 (推荐: 0.01 ~ 2.0)</p>
+                            <h2 data-zh="先验不确定度 (η)" data-en="Prior Uncertainty (η)">先验不确定度 (η)</h2>
+                            <p class="param-desc" data-zh="先验分布的标准差 (推荐: 0.01 ~ 2.0)" data-en="Standard deviation of prior distribution (Recommended: 0.01 ~ 2.0)">先验分布的标准差 (推荐: 0.01 ~ 2.0)</p>
                             <div class="slider-group">
                                 <div class="label-row"><span>Small</span><span id="etaValue"
                                         class="value-display">0.20</span></div>
@@ -757,10 +798,9 @@
                             </div>
                         </div>
 
-                        <!-- 参数 2: t_end (演化时间) -->
                         <div class="param-group">
-                            <h2>演化总时间 (T)</h2>
-                            <p class="param-desc">量子演化的总时间长度 (推荐: 0.1 ~ 10.0)</p>
+                            <h2 data-zh="演化总时间 (T)" data-en="Total Evolution Time (T)">演化总时间 (T)</h2>
+                            <p class="param-desc" data-zh="量子演化的总时间长度 (推荐: 0.1 ~ 10.0)" data-en="Total time length of quantum evolution (Recommended: 0.1 ~ 10.0)">量子演化的总时间长度 (推荐: 0.1 ~ 10.0)</p>
                             <div class="slider-group">
                                 <div class="label-row"><span>Short</span><span id="tEndValue"
                                         class="value-display">1.00</span></div>
@@ -770,10 +810,9 @@
                             </div>
                         </div>
 
-                        <!-- 参数 3: B_factor (磁场强度) -->
                         <div class="param-group">
-                            <h2>磁场强度因子 (B)</h2>
-                            <p class="param-desc">磁场强度因子 (单位: π, 推荐: 0.1 ~ 5.0)</p>
+                            <h2 data-zh="磁场强度因子 (B)" data-en="Magnetic Field Strength Factor (B)">磁场强度因子 (B)</h2>
+                            <p class="param-desc" data-zh="磁场强度因子 (单位: π, 推荐: 0.1 ~ 5.0)" data-en="Magnetic field strength factor (Unit: π, Recommended: 0.1 ~ 5.0)">磁场强度因子 (单位: π, 推荐: 0.1 ~ 5.0)</p>
                             <div class="slider-group">
                                 <div class="label-row"><span>Low</span><span id="bFactorValue"
                                         class="value-display">0.50π</span></div>
@@ -783,10 +822,9 @@
                             </div>
                         </div>
 
-                        <!-- 参数 4: omega0 (特征频率) -->
                         <div class="param-group">
-                            <h2>特征频率 (ω₀)</h2>
-                            <p class="param-desc">特征频率系数 (默认: 1.0)</p>
+                            <h2 data-zh="特征频率 (ω₀)" data-en="Characteristic Frequency (ω₀)">特征频率 (ω₀)</h2>
+                            <p class="param-desc" data-zh="特征频率系数 (默认: 1.0)" data-en="Characteristic frequency coefficient (Default: 1.0)">特征频率系数 (默认: 1.0)</p>
                             <div class="slider-group">
                                 <div class="label-row"><span>Low</span><span id="omega0Value"
                                         class="value-display">1.00</span></div>
@@ -795,10 +833,9 @@
                             </div>
                         </div>
 
-                        <!-- 参数 5: mu (先验均值) -->
                         <div class="param-group" style="display: none;">
-                            <h2>先验均值 (μ)</h2>
-                            <p class="param-desc">先验分布的中心位置 (默认: 0.0)</p>
+                            <h2 data-zh="先验均值 (μ)" data-en="Prior Mean (μ)">先验均值 (μ)</h2>
+                            <p class="param-desc" data-zh="先验分布的中心位置 (默认: 0.0)" data-en="Center position of prior distribution (Default: 0.0)">先验分布的中心位置 (默认: 0.0)</p>
                             <div class="slider-group">
                                 <div class="label-row"><span>-π</span><span id="muValue"
                                         class="value-display">0.00</span></div>
@@ -807,10 +844,9 @@
                             </div>
                         </div>
 
-                        <!-- 参数 6: x_range_factor (采样范围) -->
                         <div class="param-group">
-                            <h2>采样范围系数</h2>
-                            <p class="param-desc">实际范围为 [-factor*π, factor*π] (默认: 0.5)</p>
+                            <h2 data-zh="采样范围系数" data-en="Sampling Range Coefficient">采样范围系数</h2>
+                            <p class="param-desc" data-zh="实际范围为 [-factor*π, factor*π] (默认: 0.5)" data-en="Actual range is [-factor*π, factor*π] (Default: 0.5)">实际范围为 [-factor*π, factor*π] (默认: 0.5)</p>
                             <div class="slider-group">
                                 <div class="label-row"><span>Narrow</span><span id="xRangeValue"
                                         class="value-display">0.50</span></div>
@@ -819,7 +855,7 @@
                             </div>
                         </div>
 
-                        <button id="generateBtn3" class="btn-generate">生成贝叶斯分析图</button>
+                        <button id="generateBtn3" class="btn-generate" data-zh="生成贝叶斯分析图" data-en="Generate Bayesian Analysis">生成贝叶斯分析图</button>
                         <div id="statusMsg3"
                             style="font-size: 0.8rem; color: var(--text-secondary); font-family: var(--font-mono); height: 1.2em; text-align: center; margin-top: 10px;">
                         </div>
@@ -827,7 +863,7 @@
 
                     <div class="display-panel">
                         <div class="image-container" id="imageContainer3">
-                            <div class="placeholder-text" id="placeholderText3">
+                            <div class="placeholder-text" id="placeholderText3" data-zh="[ 准备就绪 ]<br>调整贝叶斯参数并点击生成" data-en="[ Ready ]<br>Adjust Bayesian parameters and click generate">
                                 [ 准备就绪 ]
                                 <br>
                                 调整贝叶斯参数并点击生成
@@ -843,17 +879,16 @@
             <div id="tab4" class="tab-content">
                 <div class="intro">
                     <div style="position: relative;display: flex;align-items: center;">
-                        <h1>量子参数估计 - 贝叶斯与最大似然估计</h1>
-                        <button class="btn-generate preview-document">查看原理</button>
+                        <h1 data-zh="量子参数估计 - 贝叶斯与最大似然估计" data-en="Quantum Parameter Estimation - Bayesian and Maximum Likelihood Estimation">量子参数估计 - 贝叶斯与最大似然估计</h1>
+                        <button class="btn-generate preview-document" data-zh="查看原理" data-en="View Principles">查看原理</button>
                     </div>
-                    <p>模拟量子参数估计过程，对比贝叶斯估计（MAP）与最大似然估计（MLE）的性能差异。</p>
+                    <p data-zh="模拟量子参数估计过程，对比贝叶斯估计（MAP）与最大似然估计（MLE）的性能差异。" data-en="Simulate quantum parameter estimation process, comparing performance differences between Bayesian estimation (MAP) and Maximum Likelihood Estimation (MLE).">模拟量子参数估计过程，对比贝叶斯估计（MAP）与最大似然估计（MLE）的性能差异。</p>
                 </div>
                 <div class="container">
                     <div class="control-panel">
-                        <!-- 参数 1: B_factor (磁场强度) -->
                         <div class="param-group">
-                            <h2>磁场强度因子 (B)</h2>
-                            <p class="param-desc">磁场强度因子 (单位: π)</p>
+                            <h2 data-zh="磁场强度因子 (B)" data-en="Magnetic Field Strength Factor (B)">磁场强度因子 (B)</h2>
+                            <p class="param-desc" data-zh="磁场强度因子 (单位: π)" data-en="Magnetic field strength factor (Unit: π)">磁场强度因子 (单位: π)</p>
                             <div class="slider-group">
                                 <div class="label-row"><span>Low</span><span id="bFactorValue4" class="value-display">0.50π</span></div>
                                 <input type="range" id="bFactorSlider4" min="0.1" max="5.0" step="0.1" value="0.5">
@@ -861,10 +896,9 @@
                             </div>
                         </div>
 
-                        <!-- 参数 2: omega0 (角频率) -->
                         <div class="param-group">
-                            <h2>角频率 (ω₀)</h2>
-                            <p class="param-desc">系统的角频率参数</p>
+                            <h2 data-zh="角频率 (ω₀)" data-en="Angular Frequency (ω₀)">角频率 (ω₀)</h2>
+                            <p class="param-desc" data-zh="系统的角频率参数" data-en="Angular frequency parameter of the system">系统的角频率参数</p>
                             <div class="slider-group">
                                 <div class="label-row"><span>Low</span><span id="omega0Value4" class="value-display">1.00</span></div>
                                 <input type="range" id="omega0Slider4" min="0.1" max="5.0" step="0.1" value="1.0">
@@ -872,10 +906,9 @@
                             </div>
                         </div>
 
-                        <!-- 参数 3&4: 参数x范围 (最小值~最大值) -->
                         <div class="param-group">
-                            <h2>参数 x 范围</h2>
-                            <p class="param-desc">待估计参数 x 的取值范围 (单位: π)</p>
+                            <h2 data-zh="参数 x 范围" data-en="Parameter x Range">参数 x 范围</h2>
+                            <p class="param-desc" data-zh="待估计参数 x 的取值范围 (单位: π)" data-en="Range of parameter x to be estimated (Unit: π)">待估计参数 x 的取值范围 (单位: π)</p>
                             <div class="slider-group">
                                 <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
                                     <div style="flex: 1; display: flex; flex-direction: column; gap: 4px;">
@@ -894,14 +927,13 @@
                                             onblur="this.style.borderColor='var(--border-color)'; this.style.boxShadow='none';">
                                     </div>
                                 </div>
-                                <div class="label-row" style="font-size: 0.7rem;"><span>范围: 0 ~ 2.0π</span></div>
+                                <div class="label-row" style="font-size: 0.7rem;" data-zh="范围: 0 ~ 2.0π" data-en="Range: 0 ~ 2.0π">范围: 0 ~ 2.0π</div>
                             </div>
                         </div>
 
-                        <!-- 参数 5: t_max (时间演化最大值) -->
                         <div class="param-group">
-                            <h2>演化时间 (T)</h2>
-                            <p class="param-desc">时间演化的最大值</p>
+                            <h2 data-zh="演化时间 (T)" data-en="Evolution Time (T)">演化时间 (T)</h2>
+                            <p class="param-desc" data-zh="时间演化的最大值" data-en="Maximum value of time evolution">时间演化的最大值</p>
                             <div class="slider-group">
                                 <div class="label-row"><span>Short</span><span id="tMaxValue4" class="value-display">1.00</span></div>
                                 <input type="range" id="tMaxSlider4" min="0.1" max="10.0" step="0.1" value="1.0">
@@ -909,10 +941,9 @@
                             </div>
                         </div>
 
-                        <!-- 参数 6: y_num (测量次数) -->
                         <div class="param-group">
-                            <h2>测量次数 (N)</h2>
-                            <p class="param-desc">重复测量的次数</p>
+                            <h2 data-zh="测量次数 (N)" data-en="Number of Measurements (N)">测量次数 (N)</h2>
+                            <p class="param-desc" data-zh="重复测量的次数" data-en="Number of repeated measurements">重复测量的次数</p>
                             <div class="slider-group">
                                 <div class="label-row"><span>Few</span><span id="yNumValue4" class="value-display">1000</span></div>
                                 <input type="range" id="yNumSlider4" min="100" max="5000" step="100" value="1000">
@@ -920,10 +951,9 @@
                             </div>
                         </div>
 
-                        <!-- 参数 7: seed (随机种子) -->
                         <div class="param-group">
-                            <h2>随机种子</h2>
-                            <p class="param-desc">用于结果复现</p>
+                            <h2 data-zh="随机种子" data-en="Random Seed">随机种子</h2>
+                            <p class="param-desc" data-zh="用于结果复现" data-en="Used for result reproduction">用于结果复现</p>
                             <div class="slider-group">
                                 <div class="label-row"><span>Low</span><span id="seedValue4" class="value-display">1234</span></div>
                                 <input type="range" id="seedSlider4" min="1" max="9999" step="1" value="1234">
@@ -931,10 +961,9 @@
                             </div>
                         </div>
 
-                        <!-- 参数 8: prob_threshold (概率阈值) -->
                         <div class="param-group">
-                            <h2>概率阈值</h2>
-                            <p class="param-desc">测量结果的概率阈值</p>
+                            <h2 data-zh="概率阈值" data-en="Probability Threshold">概率阈值</h2>
+                            <p class="param-desc" data-zh="测量结果的概率阈值" data-en="Probability threshold for measurement results">测量结果的概率阈值</p>
                             <div class="slider-group">
                                 <div class="label-row"><span>Low</span><span id="probThreshValue4" class="value-display">0.333</span></div>
                                 <input type="range" id="probThreshSlider4" min="0.1" max="0.9" step="0.01" value="0.333">
@@ -942,7 +971,7 @@
                             </div>
                         </div>
 
-                        <button id="generateBtn4" class="btn-generate">生成参数估计图</button>
+                        <button id="generateBtn4" class="btn-generate" data-zh="生成参数估计图" data-en="Generate Parameter Estimation">生成参数估计图</button>
                         <div id="statusMsg4"
                             style="font-size: 0.8rem; color: var(--text-secondary); font-family: var(--font-mono); height: 1.2em; text-align: center; margin-top: 10px;">
                         </div>
@@ -950,7 +979,7 @@
 
                     <div class="display-panel">
                         <div class="image-container" id="imageContainer4">
-                            <div class="placeholder-text" id="placeholderText4">
+                            <div class="placeholder-text" id="placeholderText4" data-zh="[ 准备就绪 ]<br>调整参数并点击生成" data-en="[ Ready ]<br>Adjust parameters and click generate">
                                 [ 准备就绪 ]
                                 <br>
                                 调整参数并点击生成
@@ -968,17 +997,16 @@
                 <div id="tab5-1" class="tab5-sub-content active">
                     <div class="intro">
                         <div style="position: relative;display: flex;align-items: center;">
-                            <h1>投影测量优化</h1>
-                            <button class="btn-generate preview-document">查看原理</button>
+                            <h1 data-zh="投影测量优化" data-en="Projection Measurement Optimization">投影测量优化</h1>
+                            <button class="btn-generate preview-document" data-zh="查看原理" data-en="View Principles">查看原理</button>
                         </div>
-                        <p>基于差分进化算法优化投影测量，分析最优投影测量的结果。</p>
+                        <p data-zh="基于差分进化算法优化投影测量，分析最优投影测量的结果。" data-en="Optimize projection measurement based on differential evolution algorithm, analyze the results of optimal projection measurement.">基于差分进化算法优化投影测量，分析最优投影测量的结果。</p>
                     </div>
                     <div class="container">
                         <div class="control-panel">
-                            <!-- 参数 1: omega (系统频率) -->
                             <div class="param-group">
-                                <h2>系统频率 (ω)</h2>
-                                <p class="param-desc">系统哈密顿量的本征频率</p>
+                                <h2 data-zh="系统频率 (ω)" data-en="System Frequency (ω)">系统频率 (ω)</h2>
+                                <p class="param-desc" data-zh="系统哈密顿量的本征频率" data-en="Eigenfrequency of the system Hamiltonian">系统哈密顿量的本征频率</p>
                                 <div class="slider-group">
                                     <div class="label-row"><span>Low</span><span id="omegaValue5" class="value-display">1.00</span></div>
                                     <input type="range" id="omegaSlider5" min="0.1" max="5.0" step="0.1" value="1.0">
@@ -986,10 +1014,9 @@
                                 </div>
                             </div>
 
-                            <!-- 参数 2: t_end (演化时间) -->
                             <div class="param-group">
-                                <h2>演化时间 (T)</h2>
-                                <p class="param-desc">系统演化的最大时间点</p>
+                                <h2 data-zh="演化时间 (T)" data-en="Evolution Time (T)">演化时间 (T)</h2>
+                                <p class="param-desc" data-zh="系统演化的最大时间点" data-en="Maximum time point of system evolution">系统演化的最大时间点</p>
                                 <div class="slider-group">
                                     <div class="label-row"><span>Short</span><span id="tEndValue5" class="value-display">10</span></div>
                                     <input type="range" id="tEndSlider5" min="5" max="50" step="5" value="10">
@@ -997,10 +1024,9 @@
                                 </div>
                             </div>
 
-                            <!-- 参数 3: t_points (时间点数) -->
                             <div class="param-group">
-                                <h2>时间采样点数</h2>
-                                <p class="param-desc">时间演化采样点数量</p>
+                                <h2 data-zh="时间采样点数" data-en="Time Sampling Points">时间采样点数</h2>
+                                <p class="param-desc" data-zh="时间演化采样点数量" data-en="Number of time evolution sampling points">时间演化采样点数量</p>
                                 <div class="slider-group">
                                     <div class="label-row"><span>Few</span><span id="tPointsValue5" class="value-display">25</span></div>
                                     <input type="range" id="tPointsSlider5" min="10" max="100" step="5" value="25">
@@ -1008,10 +1034,9 @@
                                 </div>
                             </div>
 
-                            <!-- 参数 4: decay_rate_1 (衰减率1) -->
                             <div class="param-group">
-                                <h2>衰减率 1 (γ₁)</h2>
-                                <p class="param-desc">第一个衰减通道的速率</p>
+                                <h2 data-zh="衰减率 1 (γ₁)" data-en="Decay Rate 1 (γ₁)">衰减率 1 (γ₁)</h2>
+                                <p class="param-desc" data-zh="第一个衰减通道的速率" data-en="Rate of the first decay channel">第一个衰减通道的速率</p>
                                 <div class="slider-group">
                                     <div class="label-row"><span>None</span><span id="decay1Value5" class="value-display">0.00</span></div>
                                     <input type="range" id="decay1Slider5" min="0.0" max="1.0" step="0.05" value="0.0">
@@ -1019,10 +1044,9 @@
                                 </div>
                             </div>
 
-                            <!-- 参数 5: decay_rate_2 (衰减率2) -->
                             <div class="param-group">
-                                <h2>衰减率 2 (γ₂)</h2>
-                                <p class="param-desc">第二个衰减通道的速率</p>
+                                <h2 data-zh="衰减率 2 (γ₂)" data-en="Decay Rate 2 (γ₂)">衰减率 2 (γ₂)</h2>
+                                <p class="param-desc" data-zh="第二个衰减通道的速率" data-en="Rate of the second decay channel">第二个衰减通道的速率</p>
                                 <div class="slider-group">
                                     <div class="label-row"><span>Weak</span><span id="decay2Value5" class="value-display">0.10</span></div>
                                     <input type="range" id="decay2Slider5" min="0.0" max="1.0" step="0.05" value="0.1">
@@ -1030,10 +1054,9 @@
                                 </div>
                             </div>
 
-                            <!-- 参数 6: max_episode (最大迭代次数) -->
                             <div class="param-group">
-                                <h2>最大迭代次数</h2>
-                                <p class="param-desc">DE算法的最大迭代次数</p>
+                                <h2 data-zh="最大迭代次数" data-en="Maximum Iterations">最大迭代次数</h2>
+                                <p class="param-desc" data-zh="DE算法的最大迭代次数" data-en="Maximum iterations of DE algorithm">DE算法的最大迭代次数</p>
                                 <div class="slider-group">
                                     <div class="label-row"><span>Few</span><span id="maxEpisodeValue5" class="value-display">1000</span></div>
                                     <input type="range" id="maxEpisodeSlider5" min="100" max="3000" step="100" value="1000">
@@ -1041,10 +1064,9 @@
                                 </div>
                             </div>
 
-                            <!-- 参数 7: p_num (粒子数) -->
                             <div class="param-group">
-                                <h2>粒子数量</h2>
-                                <p class="param-desc">DE算法的粒子数量</p>
+                                <h2 data-zh="粒子数量" data-en="Number of Particles">粒子数量</h2>
+                                <p class="param-desc" data-zh="DE算法的粒子数量" data-en="Number of particles in DE algorithm">DE算法的粒子数量</p>
                                 <div class="slider-group">
                                     <div class="label-row"><span>Few</span><span id="pNumValue5" class="value-display">10</span></div>
                                     <input type="range" id="pNumSlider5" min="5" max="50" step="5" value="10">
@@ -1052,7 +1074,7 @@
                                 </div>
                             </div>
 
-                            <button id="generateBtn5" class="btn-generate">生成测量优化图</button>
+                            <button id="generateBtn5" class="btn-generate" data-zh="生成测量优化图" data-en="Generate Measurement Optimization">生成测量优化图</button>
                             <div id="statusMsg5"
                                 style="font-size: 0.8rem; color: var(--text-secondary); font-family: var(--font-mono); height: 1.2em; text-align: center; margin-top: 10px;">
                             </div>
@@ -1060,7 +1082,7 @@
 
                         <div class="display-panel">
                             <div class="image-container" id="imageContainer5">
-                                <div class="placeholder-text" id="placeholderText5">
+                                <div class="placeholder-text" id="placeholderText5" data-zh="[ 准备就绪 ]<br>调整参数并点击生成" data-en="[ Ready ]<br>Adjust parameters and click generate">
                                     [ 准备就绪 ]
                                     <br>
                                     调整参数并点击生成
@@ -1075,17 +1097,16 @@
                 <div id="tab5-2" class="tab5-sub-content">
                     <div class="intro">
                         <div style="position: relative;display: flex;align-items: center;">
-                            <h1>LC输入测量优化</h1>
-                            <button class="btn-generate preview-document">查看原理</button>
+                            <h1 data-zh="LC输入测量优化" data-en="LC Input Measurement Optimization">LC输入测量优化</h1>
+                            <button class="btn-generate preview-document" data-zh="查看原理" data-en="View Principles">查看原理</button>
                         </div>
-                        <p>基于差分进化算法优化LC输入测量，分析最优LC输入测量的结果。</p>
+                        <p data-zh="基于差分进化算法优化LC输入测量，分析最优LC输入测量的结果。" data-en="Optimize LC input measurement based on differential evolution algorithm, analyze the results of optimal LC input measurement.">基于差分进化算法优化LC输入测量，分析最优LC输入测量的结果。</p>
                     </div>
                     <div class="container">
                         <div class="control-panel">
-                            <!-- 参数 1: omega (系统频率) -->
                             <div class="param-group">
-                                <h2>系统频率 (ω)</h2>
-                                <p class="param-desc">系统哈密顿量的本征频率</p>
+                                <h2 data-zh="系统频率 (ω)" data-en="System Frequency (ω)">系统频率 (ω)</h2>
+                                <p class="param-desc" data-zh="系统哈密顿量的本征频率" data-en="Eigenfrequency of the system Hamiltonian">系统哈密顿量的本征频率</p>
                                 <div class="slider-group">
                                     <div class="label-row"><span>Low</span><span id="omegaValue5_2" class="value-display">1.00</span></div>
                                     <input type="range" id="omegaSlider5_2" min="0.1" max="5.0" step="0.1" value="1.0">
@@ -1093,10 +1114,9 @@
                                 </div>
                             </div>
 
-                            <!-- 参数 2: t_end (演化时间) -->
                             <div class="param-group">
-                                <h2>演化时间 (T)</h2>
-                                <p class="param-desc">系统演化的最大时间点</p>
+                                <h2 data-zh="演化时间 (T)" data-en="Evolution Time (T)">演化时间 (T)</h2>
+                                <p class="param-desc" data-zh="系统演化的最大时间点" data-en="Maximum time point of system evolution">系统演化的最大时间点</p>
                                 <div class="slider-group">
                                     <div class="label-row"><span>Short</span><span id="tEndValue5_2" class="value-display">10</span></div>
                                     <input type="range" id="tEndSlider5_2" min="5" max="50" step="5" value="10">
@@ -1104,10 +1124,9 @@
                                 </div>
                             </div>
 
-                            <!-- 参数 3: t_points (时间点数) -->
                             <div class="param-group">
-                                <h2>时间采样点数</h2>
-                                <p class="param-desc">时间演化采样点数量</p>
+                                <h2 data-zh="时间采样点数" data-en="Time Sampling Points">时间采样点数</h2>
+                                <p class="param-desc" data-zh="时间演化采样点数量" data-en="Number of time evolution sampling points">时间演化采样点数量</p>
                                 <div class="slider-group">
                                     <div class="label-row"><span>Few</span><span id="tPointsValue5_2" class="value-display">25</span></div>
                                     <input type="range" id="tPointsSlider5_2" min="10" max="100" step="5" value="25">
@@ -1115,10 +1134,9 @@
                                 </div>
                             </div>
 
-                            <!-- 参数 4: decay_rate_1 (衰减率1) -->
                             <div class="param-group">
-                                <h2>衰减率 1 (γ₁)</h2>
-                                <p class="param-desc">第一个衰减通道的速率</p>
+                                <h2 data-zh="衰减率 1 (γ₁)" data-en="Decay Rate 1 (γ₁)">衰减率 1 (γ₁)</h2>
+                                <p class="param-desc" data-zh="第一个衰减通道的速率" data-en="Rate of the first decay channel">第一个衰减通道的速率</p>
                                 <div class="slider-group">
                                     <div class="label-row"><span>None</span><span id="decay1Value5_2" class="value-display">0.00</span></div>
                                     <input type="range" id="decay1Slider5_2" min="0.0" max="1.0" step="0.05" value="0.0">
@@ -1126,10 +1144,9 @@
                                 </div>
                             </div>
 
-                            <!-- 参数 5: decay_rate_2 (衰减率2) -->
                             <div class="param-group">
-                                <h2>衰减率 2 (γ₂)</h2>
-                                <p class="param-desc">第二个衰减通道的速率</p>
+                                <h2 data-zh="衰减率 2 (γ₂)" data-en="Decay Rate 2 (γ₂)">衰减率 2 (γ₂)</h2>
+                                <p class="param-desc" data-zh="第二个衰减通道的速率" data-en="Rate of the second decay channel">第二个衰减通道的速率</p>
                                 <div class="slider-group">
                                     <div class="label-row"><span>Weak</span><span id="decay2Value5_2" class="value-display">0.10</span></div>
                                     <input type="range" id="decay2Slider5_2" min="0.0" max="1.0" step="0.05" value="0.1">
@@ -1137,10 +1154,9 @@
                                 </div>
                             </div>
 
-                            <!-- 参数 6: max_episode (最大迭代次数) -->
                             <div class="param-group">
-                                <h2>最大迭代次数</h2>
-                                <p class="param-desc">DE算法的最大迭代次数</p>
+                                <h2 data-zh="最大迭代次数" data-en="Maximum Iterations">最大迭代次数</h2>
+                                <p class="param-desc" data-zh="DE算法的最大迭代次数" data-en="Maximum iterations of DE algorithm">DE算法的最大迭代次数</p>
                                 <div class="slider-group">
                                     <div class="label-row"><span>Few</span><span id="maxEpisodeValue5_2" class="value-display">1000</span></div>
                                     <input type="range" id="maxEpisodeSlider5_2" min="100" max="3000" step="100" value="1000">
@@ -1148,10 +1164,9 @@
                                 </div>
                             </div>
 
-                            <!-- 参数 7: p_num (粒子数) -->
                             <div class="param-group">
-                                <h2>粒子数量</h2>
-                                <p class="param-desc">DE算法的粒子数量</p>
+                                <h2 data-zh="粒子数量" data-en="Number of Particles">粒子数量</h2>
+                                <p class="param-desc" data-zh="DE算法的粒子数量" data-en="Number of particles in DE algorithm">DE算法的粒子数量</p>
                                 <div class="slider-group">
                                     <div class="label-row"><span>Few</span><span id="pNumValue5_2" class="value-display">10</span></div>
                                     <input type="range" id="pNumSlider5_2" min="5" max="50" step="5" value="10">
@@ -1159,7 +1174,7 @@
                                 </div>
                             </div>
 
-                            <button id="generateBtn5_2" class="btn-generate">生成LC输入测量图</button>
+                            <button id="generateBtn5_2" class="btn-generate" data-zh="生成LC输入测量图" data-en="Generate LC Input Measurement">生成LC输入测量图</button>
                             <div id="statusMsg5_2"
                                 style="font-size: 0.8rem; color: var(--text-secondary); font-family: var(--font-mono); height: 1.2em; text-align: center; margin-top: 10px;">
                             </div>
@@ -1167,7 +1182,7 @@
 
                         <div class="display-panel">
                             <div class="image-container" id="imageContainer5_2">
-                                <div class="placeholder-text" id="placeholderText5_2">
+                                <div class="placeholder-text" id="placeholderText5_2" data-zh="[ 准备就绪 ]<br>调整参数并点击生成" data-en="[ Ready ]<br>Adjust parameters and click generate">
                                     [ 准备就绪 ]
                                     <br>
                                     调整参数并点击生成
@@ -1182,17 +1197,16 @@
                 <div id="tab5-3" class="tab5-sub-content">
                     <div class="intro">
                         <div style="position: relative;display: flex;align-items: center;">
-                            <h1>旋转输入测量优化</h1>
-                            <button class="btn-generate preview-document">查看原理</button>
+                            <h1 data-zh="旋转输入测量优化" data-en="Rotation Input Measurement Optimization">旋转输入测量优化</h1>
+                            <button class="btn-generate preview-document" data-zh="查看原理" data-en="View Principles">查看原理</button>
                         </div>
-                        <p>基于差分进化算法优化旋转输入测量，分析最优旋转输入测量的结果。</p>
+                        <p data-zh="基于差分进化算法优化旋转输入测量，分析最优旋转输入测量的结果。" data-en="Optimize rotation input measurement based on differential evolution algorithm, analyze the results of optimal rotation input measurement.">基于差分进化算法优化旋转输入测量，分析最优旋转输入测量的结果。</p>
                     </div>
                     <div class="container">
                         <div class="control-panel">
-                            <!-- 参数 1: omega (系统频率) -->
                             <div class="param-group">
-                                <h2>系统频率 (ω)</h2>
-                                <p class="param-desc">系统哈密顿量的本征频率</p>
+                                <h2 data-zh="系统频率 (ω)" data-en="System Frequency (ω)">系统频率 (ω)</h2>
+                                <p class="param-desc" data-zh="系统哈密顿量的本征频率" data-en="Eigenfrequency of the system Hamiltonian">系统哈密顿量的本征频率</p>
                                 <div class="slider-group">
                                     <div class="label-row"><span>Low</span><span id="omegaValue5_3" class="value-display">1.00</span></div>
                                     <input type="range" id="omegaSlider5_3" min="0.1" max="5.0" step="0.1" value="1.0">
@@ -1200,10 +1214,9 @@
                                 </div>
                             </div>
 
-                            <!-- 参数 2: t_end (演化时间) -->
                             <div class="param-group">
-                                <h2>演化时间 (T)</h2>
-                                <p class="param-desc">系统演化的最大时间点</p>
+                                <h2 data-zh="演化时间 (T)" data-en="Evolution Time (T)">演化时间 (T)</h2>
+                                <p class="param-desc" data-zh="系统演化的最大时间点" data-en="Maximum time point of system evolution">系统演化的最大时间点</p>
                                 <div class="slider-group">
                                     <div class="label-row"><span>Short</span><span id="tEndValue5_3" class="value-display">10</span></div>
                                     <input type="range" id="tEndSlider5_3" min="5" max="50" step="5" value="10">
@@ -1211,10 +1224,9 @@
                                 </div>
                             </div>
 
-                            <!-- 参数 3: t_points (时间点数) -->
                             <div class="param-group">
-                                <h2>时间采样点数</h2>
-                                <p class="param-desc">时间演化采样点数量</p>
+                                <h2 data-zh="时间采样点数" data-en="Time Sampling Points">时间采样点数</h2>
+                                <p class="param-desc" data-zh="时间演化采样点数量" data-en="Number of time evolution sampling points">时间演化采样点数量</p>
                                 <div class="slider-group">
                                     <div class="label-row"><span>Few</span><span id="tPointsValue5_3" class="value-display">25</span></div>
                                     <input type="range" id="tPointsSlider5_3" min="10" max="100" step="5" value="25">
@@ -1222,10 +1234,9 @@
                                 </div>
                             </div>
 
-                            <!-- 参数 4: decay_rate_1 (衰减率1) -->
                             <div class="param-group">
-                                <h2>衰减率 1 (γ₁)</h2>
-                                <p class="param-desc">第一个衰减通道的速率</p>
+                                <h2 data-zh="衰减率 1 (γ₁)" data-en="Decay Rate 1 (γ₁)">衰减率 1 (γ₁)</h2>
+                                <p class="param-desc" data-zh="第一个衰减通道的速率" data-en="Rate of the first decay channel">第一个衰减通道的速率</p>
                                 <div class="slider-group">
                                     <div class="label-row"><span>None</span><span id="decay1Value5_3" class="value-display">0.00</span></div>
                                     <input type="range" id="decay1Slider5_3" min="0.0" max="1.0" step="0.05" value="0.0">
@@ -1233,10 +1244,9 @@
                                 </div>
                             </div>
 
-                            <!-- 参数 5: decay_rate_2 (衰减率2) -->
                             <div class="param-group">
-                                <h2>衰减率 2 (γ₂)</h2>
-                                <p class="param-desc">第二个衰减通道的速率</p>
+                                <h2 data-zh="衰减率 2 (γ₂)" data-en="Decay Rate 2 (γ₂)">衰减率 2 (γ₂)</h2>
+                                <p class="param-desc" data-zh="第二个衰减通道的速率" data-en="Rate of the second decay channel">第二个衰减通道的速率</p>
                                 <div class="slider-group">
                                     <div class="label-row"><span>Weak</span><span id="decay2Value5_3" class="value-display">0.10</span></div>
                                     <input type="range" id="decay2Slider5_3" min="0.0" max="1.0" step="0.05" value="0.1">
@@ -1244,10 +1254,9 @@
                                 </div>
                             </div>
 
-                            <!-- 参数 6: max_episode (最大迭代次数) -->
                             <div class="param-group">
-                                <h2>最大迭代次数</h2>
-                                <p class="param-desc">DE算法的最大迭代次数</p>
+                                <h2 data-zh="最大迭代次数" data-en="Maximum Iterations">最大迭代次数</h2>
+                                <p class="param-desc" data-zh="DE算法的最大迭代次数" data-en="Maximum iterations of DE algorithm">DE算法的最大迭代次数</p>
                                 <div class="slider-group">
                                     <div class="label-row"><span>Few</span><span id="maxEpisodeValue5_3" class="value-display">1000</span></div>
                                     <input type="range" id="maxEpisodeSlider5_3" min="100" max="3000" step="100" value="1000">
@@ -1255,10 +1264,9 @@
                                 </div>
                             </div>
 
-                            <!-- 参数 7: p_num (粒子数) -->
                             <div class="param-group">
-                                <h2>粒子数量</h2>
-                                <p class="param-desc">DE算法的粒子数量</p>
+                                <h2 data-zh="粒子数量" data-en="Number of Particles">粒子数量</h2>
+                                <p class="param-desc" data-zh="DE算法的粒子数量" data-en="Number of particles in DE algorithm">DE算法的粒子数量</p>
                                 <div class="slider-group">
                                     <div class="label-row"><span>Few</span><span id="pNumValue5_3" class="value-display">10</span></div>
                                     <input type="range" id="pNumSlider5_3" min="5" max="50" step="5" value="10">
@@ -1266,7 +1274,7 @@
                                 </div>
                             </div>
 
-                            <button id="generateBtn5_3" class="btn-generate">生成旋转输入测量图</button>
+                            <button id="generateBtn5_3" class="btn-generate" data-zh="生成旋转输入测量图" data-en="Generate Rotation Input Measurement">生成旋转输入测量图</button>
                             <div id="statusMsg5_3"
                                 style="font-size: 0.8rem; color: var(--text-secondary); font-family: var(--font-mono); height: 1.2em; text-align: center; margin-top: 10px;">
                             </div>
@@ -1274,7 +1282,7 @@
 
                         <div class="display-panel">
                             <div class="image-container" id="imageContainer5_3">
-                                <div class="placeholder-text" id="placeholderText5_3">
+                                <div class="placeholder-text" id="placeholderText5_3" data-zh="[ 准备就绪 ]<br>调整参数并点击生成" data-en="[ Ready ]<br>Adjust parameters and click generate">
                                     [ 准备就绪 ]
                                     <br>
                                     调整参数并点击生成
@@ -1291,17 +1299,16 @@
             <div id="tab6" class="tab-content">
                 <div class="intro">
                     <div style="position: relative;display: flex;align-items: center;">
-                        <h1>量子状态优化算法</h1>
-                        <button class="btn-generate preview-document">查看原理</button>
+                        <h1 data-zh="量子状态优化算法" data-en="Quantum State Optimization Algorithm">量子状态优化算法</h1>
+                        <button class="btn-generate preview-document" data-zh="查看原理" data-en="View Principles">查看原理</button>
                     </div>
-                    <p>基于AD算法优化量子状态，生成QFI收敛曲线，分析量子费舍尔信息量的优化过程。</p>
+                    <p data-zh="基于AD算法优化量子状态，生成QFI收敛曲线，分析量子费舍尔信息量的优化过程。" data-en="Optimize quantum state based on AD algorithm, generate QFI convergence curve, analyze the optimization process of quantum Fisher information.">基于AD算法优化量子状态，生成QFI收敛曲线，分析量子费舍尔信息量的优化过程。</p>
                 </div>
                 <div class="container">
                     <div class="control-panel">
-                        <!-- 参数 1: N (系统维度) -->
                         <div class="param-group">
-                            <h2>系统维度 (N)</h2>
-                            <p class="param-desc">自旋粒子数的两倍</p>
+                            <h2 data-zh="系统维度 (N)" data-en="System Dimension (N)">系统维度 (N)</h2>
+                            <p class="param-desc" data-zh="自旋粒子数的两倍" data-en="Twice the number of spin particles">自旋粒子数的两倍</p>
                             <div class="slider-group">
                                 <div class="label-row"><span>Small</span><span id="nValue6" class="value-display">8</span></div>
                                 <input type="range" id="nSlider6" min="2" max="20" step="2" value="8">
@@ -1309,10 +1316,9 @@
                             </div>
                         </div>
 
-                        <!-- 参数 2: Lambda (耦合系数) -->
                         <div class="param-group">
-                            <h2>耦合系数 (Λ)</h2>
-                            <p class="param-desc">哈密顿量中的耦合系数</p>
+                            <h2 data-zh="耦合系数 (Λ)" data-en="Coupling Coefficient (Λ)">耦合系数 (Λ)</h2>
+                            <p class="param-desc" data-zh="哈密顿量中的耦合系数" data-en="Coupling coefficient in Hamiltonian">哈密顿量中的耦合系数</p>
                             <div class="slider-group">
                                 <div class="label-row"><span>Low</span><span id="lambdaValue6" class="value-display">1.00</span></div>
                                 <input type="range" id="lambdaSlider6" min="0.1" max="5.0" step="0.1" value="1.0">
@@ -1320,10 +1326,9 @@
                             </div>
                         </div>
 
-                        <!-- 参数 3: g (相互作用强度) -->
                         <div class="param-group">
-                            <h2>相互作用强度 (g)</h2>
-                            <p class="param-desc">粒子间的相互作用强度</p>
+                            <h2 data-zh="相互作用强度 (g)" data-en="Interaction Strength (g)">相互作用强度 (g)</h2>
+                            <p class="param-desc" data-zh="粒子间的相互作用强度" data-en="Interaction strength between particles">粒子间的相互作用强度</p>
                             <div class="slider-group">
                                 <div class="label-row"><span>Weak</span><span id="gValue6" class="value-display">0.50</span></div>
                                 <input type="range" id="gSlider6" min="0.0" max="2.0" step="0.1" value="0.5">
@@ -1331,10 +1336,9 @@
                             </div>
                         </div>
 
-                        <!-- 参数 4: h (外场强度) -->
                         <div class="param-group">
-                            <h2>外场强度 (h)</h2>
-                            <p class="param-desc">外场强度参数</p>
+                            <h2 data-zh="外场强度 (h)" data-en="External Field Strength (h)">外场强度 (h)</h2>
+                            <p class="param-desc" data-zh="外场强度参数" data-en="External field strength parameter">外场强度参数</p>
                             <div class="slider-group">
                                 <div class="label-row"><span>Weak</span><span id="hValue6" class="value-display">0.10</span></div>
                                 <input type="range" id="hSlider6" min="0.0" max="1.0" step="0.05" value="0.1">
@@ -1342,10 +1346,9 @@
                             </div>
                         </div>
 
-                        <!-- 参数 5: decay_rate (耗散速率) -->
                         <div class="param-group">
-                            <h2>耗散速率 (γ)</h2>
-                            <p class="param-desc">系统的耗散速率</p>
+                            <h2 data-zh="耗散速率 (γ)" data-en="Dissipation Rate (γ)">耗散速率 (γ)</h2>
+                            <p class="param-desc" data-zh="系统的耗散速率" data-en="Dissipation rate of the system">系统的耗散速率</p>
                             <div class="slider-group">
                                 <div class="label-row"><span>Weak</span><span id="decayValue6" class="value-display">0.10</span></div>
                                 <input type="range" id="decaySlider6" min="0.0" max="1.0" step="0.05" value="0.1">
@@ -1353,10 +1356,9 @@
                             </div>
                         </div>
 
-                        <!-- 参数 6: t_max (演化时间) -->
                         <div class="param-group">
-                            <h2>演化时间 (T)</h2>
-                            <p class="param-desc">演化总时间</p>
+                            <h2 data-zh="演化时间 (T)" data-en="Evolution Time (T)">演化时间 (T)</h2>
+                            <p class="param-desc" data-zh="演化总时间" data-en="Total evolution time">演化总时间</p>
                             <div class="slider-group">
                                 <div class="label-row"><span>Short</span><span id="tMaxValue6" class="value-display">10.0</span></div>
                                 <input type="range" id="tMaxSlider6" min="1" max="50" step="1" value="10">
@@ -1364,10 +1366,9 @@
                             </div>
                         </div>
 
-                        <!-- 参数 7: max_episode (最大迭代次数) -->
                         <div class="param-group">
-                            <h2>最大迭代次数</h2>
-                            <p class="param-desc">AD算法的最大迭代次数</p>
+                            <h2 data-zh="最大迭代次数" data-en="Maximum Iterations">最大迭代次数</h2>
+                            <p class="param-desc" data-zh="AD算法的最大迭代次数" data-en="Maximum iterations of AD algorithm">AD算法的最大迭代次数</p>
                             <div class="slider-group">
                                 <div class="label-row"><span>Few</span><span id="maxEpisodeValue6" class="value-display">20</span></div>
                                 <input type="range" id="maxEpisodeSlider6" min="10" max="100" step="10" value="20">
@@ -1375,10 +1376,9 @@
                             </div>
                         </div>
 
-                        <!-- 参数 8: epsilon (学习率) -->
                         <div class="param-group">
-                            <h2>学习率 (ε)</h2>
-                            <p class="param-desc">优化算法的学习率</p>
+                            <h2 data-zh="学习率 (ε)" data-en="Learning Rate (ε)">学习率 (ε)</h2>
+                            <p class="param-desc" data-zh="优化算法的学习率" data-en="Learning rate of optimization algorithm">优化算法的学习率</p>
                             <div class="slider-group">
                                 <div class="label-row"><span>Small</span><span id="epsilonValue6" class="value-display">0.010</span></div>
                                 <input type="range" id="epsilonSlider6" min="0.001" max="0.1" step="0.001" value="0.01">
@@ -1386,7 +1386,7 @@
                             </div>
                         </div>
 
-                        <button id="generateBtn6" class="btn-generate">生成状态优化图</button>
+                        <button id="generateBtn6" class="btn-generate" data-zh="生成状态优化图" data-en="Generate State Optimization">生成状态优化图</button>
                         <div id="statusMsg6"
                             style="font-size: 0.8rem; color: var(--text-secondary); font-family: var(--font-mono); height: 1.2em; text-align: center; margin-top: 10px;">
                         </div>
@@ -1395,7 +1395,7 @@
                     <div class="display-panel">
                         <div style="display: flex; flex-direction: column; gap: 20px; width: 100%; height: 100%;">
                             <div class="image-container" id="imageContainer6">
-                                <div class="placeholder-text" id="placeholderText6">
+                                <div class="placeholder-text" id="placeholderText6" data-zh="[ 准备就绪 ]<br>调整参数并点击生成" data-en="[ Ready ]<br>Adjust parameters and click generate">
                                     [ 准备就绪 ]
                                     <br>
                                     调整参数并点击生成
@@ -1403,7 +1403,7 @@
                                 <div class="loading-spinner" id="loadingSpinner6"></div>
                             </div>
                             <div class="image-container" id="imageContainer6Second">
-                                <div class="placeholder-text" id="placeholderText6Second">
+                                <div class="placeholder-text" id="placeholderText6Second" data-zh="[ 等待第一张图生成 ]" data-en="[ Waiting for first image generation ]">
                                     [ 等待第一张图生成 ]
                                 </div>
                             </div>
@@ -1418,6 +1418,42 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // ================= 语言切换功能 =================
+            let currentLang = localStorage.getItem('preferredLanguage') || 'zh';
+            
+            function switchLanguage(lang) {
+                currentLang = lang;
+                localStorage.setItem('preferredLanguage', lang);
+                
+                document.querySelectorAll('.lang-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.dataset.lang === lang) {
+                        btn.classList.add('active');
+                    }
+                });
+                
+                document.querySelectorAll('[data-zh][data-en]').forEach(element => {
+                    const text = element.getAttribute(`data-${lang}`);
+                    if (text) {
+                        if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
+                            element.placeholder = text;
+                        } else {
+                            element.innerHTML = text;
+                        }
+                    }
+                });
+                
+                document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en';
+            }
+            
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    switchLanguage(btn.dataset.lang);
+                });
+            });
+            
+            switchLanguage(currentLang);
+
             // ================= Tab 1 逻辑 =================
             const omegaSlider = document.getElementById('omegaSlider');
             const omegaValue = document.getElementById('omegaValue');
@@ -2106,7 +2142,7 @@
         modalOverlay.innerHTML = `
             <div class="modal-content">
                 <div class="modal-header">
-                    <span class="modal-title">原理文档</span>
+                    <span class="modal-title" data-zh="原理文档" data-en="Principle Document">原理文档</span>
                     <button class="modal-close">&times;</button>
                 </div>
                 <div class="modal-body">
@@ -2154,7 +2190,7 @@
                 } else if (tabId === 8) {
                     tabId = 6;
                 }
-                const docPath = `./Doc/${tabId}.html`;
+                const docPath = `./doc/${tabId}.html`;
                 openModal(docPath);
             });
         });

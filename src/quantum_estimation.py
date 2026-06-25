@@ -86,6 +86,7 @@ def MakeImg(
     plt.tight_layout()
 
     # --- 7. 文件保存 (保持不变) ---
+    os.makedirs("./Img", exist_ok=True)
     filename = str(time.time())
     plt.savefig(f"./Img/{filename}.png")
     plt.close() # 建议关闭绘图以释放内存
@@ -242,6 +243,7 @@ def run_bayesian_quantum_estimation(eta=0.2, t_end=1.0, B_factor=0.5*np.pi,
     }
     
     # --- 7. 文件保存 (保持不变) ---
+    os.makedirs("./Img", exist_ok=True)
     filename = str(time.time())
     plt.savefig(f"./Img/{filename}.png")
     plt.close() # 建议关闭绘图以释放内存
@@ -252,30 +254,18 @@ def run_bayesian_quantum_estimation(eta=0.2, t_end=1.0, B_factor=0.5*np.pi,
 
 
 def run_quantum_estimation(
-    # --- 系统哈密顿量参数 ---
-    omega1=1.0,       # 第一个粒子的能级间隔 (频率)
-    omega2=1.0,       # 第二个粒子的能级间隔 (频率) - 待估参数1
-    g=0.1,            # 粒子间的相互作用强度 - 待估参数2
-    
-    # --- 耗散参数 ---
-    gamma1=0.05,      # 第一个粒子的退相干速率
-    gamma2=0.05,      # 第二个粒子的退相干速率
-    
-    # --- 初始态参数 ---
-    theta=np.pi/4,    # 初始态叠加角: |psi> = cos(theta)|00> + sin(theta)|11>
-                      # 原代码对应 theta = pi/4 (即 1/sqrt(2), 1/sqrt(2))
-    
-    # --- 测量算符参数 ---
-    p1=0.85,          # M1 的权重/效率
-    p2=0.1,           # M2 的权重 (噪声部分)
-    
-    # --- 权重矩阵参数 ---
-    w1=1.0,           # 参数 omega2 的估计权重
-    w2=1.0,           # 参数 g 的估计权重
-    
-    # --- 模拟设置 ---
-    t_max=10.0,       # 演化总时间
-    n_points=500      # 时间采样点数 (建议 200-500 以平衡速度与平滑度)
+    omega1=1.0,
+    omega2=1.0,
+    g=0.1,
+    gamma1=0.05,
+    gamma2=0.05,
+    theta=np.pi/4,
+    p1=0.85,
+    p2=0.1,
+    w1=1.0,
+    w2=1.0,
+    t_max=10.0,
+    n_points=500
 ):
     """
     运行量子参数估计模拟，计算 CFIM, QFIM, HCRB, NHB 并绘图。
@@ -289,12 +279,9 @@ def run_quantum_estimation(
     print(f"耗散: gamma1={gamma1}, gamma2={gamma2}, 初始角 theta={theta:.4f}")
     print(f"测量: p1={p1}, p2={p2}, 权重: w1={w1}, w2={w2}")
 
-    # 1. 构建初始态 |psi> = cos(theta)|00> + sin(theta)|11>
-    # 基矢顺序: |00>, |01>, |10>, |11>
     psi0 = np.array([np.cos(theta), 0., 0., np.sin(theta)])
     rho0 = np.dot(psi0.reshape(-1, 1), psi0.reshape(1, -1).conj())
 
-    # 2. 构建自由哈密顿量
     sx = np.array([[0., 1.], [1., 0.]])
     sy = np.array([[0., -1.j], [1.j, 0.]]) 
     sz = np.array([[1., 0.], [0., -1.]])
@@ -302,83 +289,57 @@ def run_quantum_estimation(
     
     H0 = omega1*np.kron(sz, ide) + omega2*np.kron(ide, sz) + g*np.kron(sx, sx)
     
-    # 3. 构建哈密顿量导数 (待估参数为 omega2 和 g)
-    # dH/d(omega2)
     dH_omega2 = np.kron(ide, sz)
-    # dH/d(g)
     dH_g = np.kron(sx, sx)
     dH = [dH_omega2, dH_g] 
 
-    # 4. 构建耗散项 (Lindblad 算符)
-    # 格式: [[算符, 速率], ...]
     decay = [[np.kron(sz, ide), gamma1], [np.kron(ide, sz), gamma2]]
 
-    # 5. 构建测量算符 (POVM)
-    # M1 = p1 * |00><00|
     m1 = np.array([1., 0., 0., 0.])
     M1 = p1 * np.dot(m1.reshape(-1, 1), m1.reshape(1, -1).conj())
     
-    # M2 = p2 * Ones (均匀噪声/混合)
     M2 = p2 * np.ones((4, 4))
     
-    # M3 = I - M1 - M2 (保证完备性)
     M3 = np.identity(4) - M1 - M2
     
-    # 检查 M3 是否半正定 (可选，防止物理上无效的测量设置)
     if np.min(np.linalg.eigvalsh(M3)) < -1e-8:
         print("警告: 计算出的 M3 不是半正定的，请检查 p1 和 p2 的设置。")
         
     M = [M1, M2, M3]
 
-    # 6. 时间演化设置
     tspan = np.linspace(0., t_max, n_points)
     
-    # 7. 动力学演化
     dynamics = Lindblad(tspan, rho0, H0, dH, decay)
     rho, drho = dynamics.expm()
     
-    # 8. 权重矩阵
     W = np.diag([w1, w2])
 
-    # 9. 循环计算指标
-    # 注意：从索引 1 开始，避免 t=0 时可能出现的数值奇异或无意义点
     F, I, f_HCRB, f_NHB = [], [], [], []
     
-    # 进度提示
     print("正在计算 Fisher 信息量和边界...")
     
     for ti in range(1, len(tspan)):
-        # CFIM (经典 Fisher 信息量)
         I_tp = CFIM(rho[ti], drho[ti], M=M)
         I.append(I_tp)
         
-        # QFIM (量子 Fisher 信息量)
         F_tp = QFIM(rho[ti], drho[ti])
         F.append(F_tp)
         
-        # HCRB (Holevo-Cramér-Rao Bound)
-        # eps 用于数值稳定性
         f_tp1 = HCRB(rho[ti], drho[ti], W, eps=1e-6)
         f_HCRB.append(f_tp1)
         
-        # NHB (Nagaoka-Hayashi Bound)
         f_tp2 = NHB(rho[ti], drho[ti], W)
         f_NHB.append(f_tp2)
 
-    # ================= 数据处理与可视化 =================
-    t_plot = tspan[1:]  # 对应循环中的时间点
+    t_plot = tspan[1:]
     
-    # 提取迹 (Trace) 作为标量指标
     trace_I = [np.trace(np.real(x)) for x in I]
     trace_F = [np.trace(np.real(x)) for x in F]
     
-    # 处理 HCRB 和 NHB 的返回值 (可能是标量或矩阵)
     def extract_val(data_list):
         vals = []
         for x in data_list:
             if isinstance(x, np.ndarray):
-                # 如果返回的是矩阵 (有时某些版本或设置下)，取迹或对角和
-                # 通常 Bound 是标量，但为了鲁棒性处理数组情况
                 if x.ndim == 0:
                     vals.append(np.real(x))
                 else:
@@ -390,11 +351,9 @@ def run_quantum_estimation(
     val_HCRB = extract_val(f_HCRB)
     val_NHB = extract_val(f_NHB)
 
-    # 绘图
     fig, axs = plt.subplots(2, 2, figsize=(12, 10))
     fig.suptitle(f'Quantum Parameter Estimation (theta={theta:.2f}, g={g})', fontsize=16)
 
-    # 1. CFIM Trace
     axs[0, 0].plot(t_plot, trace_I, color='blue', label='Tr(CFIM)')
     axs[0, 0].set_xlabel('Time')
     axs[0, 0].set_ylabel('Trace')
@@ -402,7 +361,6 @@ def run_quantum_estimation(
     axs[0, 0].grid(True, alpha=0.3)
     axs[0, 0].legend()
 
-    # 2. QFIM Trace
     axs[0, 1].plot(t_plot, trace_F, color='green', label='Tr(QFIM)')
     axs[0, 1].set_xlabel('Time')
     axs[0, 1].set_ylabel('Trace')
@@ -410,7 +368,6 @@ def run_quantum_estimation(
     axs[0, 1].grid(True, alpha=0.3)
     axs[0, 1].legend()
 
-    # 3. HCRB
     axs[1, 0].plot(t_plot, val_HCRB, color='red', label='HCRB')
     axs[1, 0].set_xlabel('Time')
     axs[1, 0].set_ylabel('Bound Value')
@@ -418,7 +375,6 @@ def run_quantum_estimation(
     axs[1, 0].grid(True, alpha=0.3)
     axs[1, 0].legend()
 
-    # 4. NHB
     axs[1, 1].plot(t_plot, val_NHB, color='purple', label='NHB')
     axs[1, 1].set_xlabel('Time')
     axs[1, 1].set_ylabel('Bound Value')
@@ -428,26 +384,12 @@ def run_quantum_estimation(
 
     plt.tight_layout(rect=[0, 0.03, 1, 0.95])
     
-    # --- 用户要求的修改开始 ---
-    
-    # 确保目录存在
     os.makedirs("./Img", exist_ok=True)
-    
-    # 生成文件名
     filename = str(time.time())
-    
-    # 保存图片
     plt.savefig(f"./Img/{filename}.png")
-    
-    # 关闭绘图以释放内存
     plt.close()
-    
-    # 打印提示信息
     print(f"图片已保存至: ./Img/{filename}.png")
-    
-    # --- 用户要求的修改结束 ---
 
-    # 返回数据以便进一步分析
     results = {
         'time': t_plot,
         'trace_I': trace_I,
@@ -457,8 +399,6 @@ def run_quantum_estimation(
     }
     
     print("模拟完成。")
-    
-    # 修改返回值以包含文件名
     return f"{filename}.png", results
 
 def run_quantum_parameter_estimation(
@@ -555,6 +495,7 @@ def run_quantum_parameter_estimation(
 
     plt.tight_layout()
     
+    os.makedirs("./Img", exist_ok=True)
     filename = str(time.time())
     plt.savefig(f"./Img/{filename}.png")
     plt.close()
